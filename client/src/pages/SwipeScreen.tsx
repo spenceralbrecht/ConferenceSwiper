@@ -172,9 +172,9 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
       />
 
       <div className="swipe-container relative flex-1 mx-4 mb-1 rounded-xl overflow-hidden border border-gray-200" ref={constraintsRef}>
-        {/* Debug Banner */}
-        <div className="absolute top-0 left-0 right-0 bg-blue-100 text-blue-800 text-xs p-1 text-center z-50">
-          {remainingEvents.length} events available to swipe
+        {/* Event count indicator (moved to top-right corner) */}
+        <div className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full z-50 opacity-70">
+          {remainingEvents.length} events
         </div>
         
         {/* Swipe indicators */}
@@ -183,14 +183,13 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         
         {remainingEvents.length > 0 && currentEvent ? (
           <>
-            {/* Next card in stack (shown behind current card) */}
+            {/* Next card in stack (hidden until current is swiped) */}
             {currentIndex < remainingEvents.length - 1 && (
               <div
-                className="absolute inset-0 w-full h-full px-2 py-2"
+                className="absolute inset-0 w-full h-full px-2 py-2 opacity-0"
                 style={{ 
                   zIndex: 5, 
-                  transform: 'scale(0.98) translateY(5px)',
-                  opacity: 0.7
+                  transform: 'scale(0.98) translateY(5px)'
                 }}
               >
                 <EventCard 

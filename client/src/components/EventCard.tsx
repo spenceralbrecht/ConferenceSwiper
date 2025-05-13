@@ -73,7 +73,7 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
     <div 
       className="rounded-xl bg-white shadow-lg overflow-hidden h-full relative"
       style={{ 
-        minHeight: "470px", 
+        minHeight: "420px", 
         background: "#ffffff",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
         border: `2px solid ${getCardBorderColor()}`,
@@ -95,17 +95,17 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
         </div>
       </div>
       
-      <div className="p-4">
+      <div className="p-3">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <span className={`inline-block ${getTypeBadgeStyle()} text-xs px-2 py-1 rounded-full font-medium`}>
               {getEventTypeLabel()}
             </span>
-            <h2 className="mt-2 text-lg font-semibold">{event.title}</h2>
+            <h2 className="mt-1 text-lg font-semibold">{event.title}</h2>
           </div>
         </div>
         
-        <div className="mt-2 flex items-center text-sm text-gray-500">
+        <div className="mt-1 flex items-center text-sm text-gray-500">
           <Calendar className="h-4 w-4 mr-1 flex-shrink-0" />
           <span>{formatDate(event.date)}</span>
         </div>
@@ -137,7 +137,7 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
           }
         })()}
         
-        <div className="mt-2 text-gray-600 text-sm line-clamp-2">
+        <div className="mt-1 text-gray-600 text-sm line-clamp-2">
           {event.description}
         </div>
         
@@ -147,12 +147,12 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
             const additionalData = JSON.parse(event.additionalData);
             if (additionalData.action && additionalData.actionLink) {
               return (
-                <div className="mt-4">
+                <div className="mt-2">
                   <a 
                     href={additionalData.actionLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors"
+                    className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-md text-xs transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {additionalData.action}

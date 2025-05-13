@@ -68,9 +68,9 @@
 
 /* Make the swipe container have proper height */
 .swipe-container {
-  min-height: 560px;
-  height: calc(100vh - 150px);
-  max-height: 650px;
+  min-height: 440px;
+  height: calc(100vh - 130px);
+  max-height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
