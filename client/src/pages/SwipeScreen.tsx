@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Event } from "@shared/schema";
 import EventCard from "@/components/EventCard";
-import EventDetailModal from "@/components/EventDetailModal";
 import FilterPanel from "@/components/FilterPanel";
 import { useSchedule } from "@/hooks/use-schedule";
 import { motion, PanInfo, useAnimation } from "framer-motion";
-import { X, Check, Info } from "lucide-react";
+import { X, Check } from "lucide-react";
 
 interface SwipeScreenProps {
   events: Event[];
@@ -16,9 +15,7 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [viewableEvents, setViewableEvents] = useState<Event[]>([]);
-  const [showModal, setShowModal] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [activeFilters, setActiveFilters] = useState<{
     main: boolean;
     workshop: boolean;
@@ -68,28 +65,67 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
     const threshold = 100;
     const xOffset = info.offset.x;
     
+    // Update the rotation based on drag position for more natural card movement
+    const rotate = xOffset * 0.2; // Rotate more the further you drag
+    
     if (xOffset > threshold) {
       // Swiped right - Interested
       console.log("Swiped right (interested):", currentEvent.id);
-      await controls.start({ x: "120%", rotate: 30, opacity: 0 });
+      await controls.start({ 
+        x: "120%", 
+        y: "-10%",
+        rotate: Math.max(15, rotate), 
+        opacity: 0,
+        transition: { duration: 0.3 }
+      });
       addInterested(currentEvent);
       nextCard();
     } else if (xOffset < -threshold) {
       // Swiped left - Not Interested
       console.log("Swiped left (not interested):", currentEvent.id);
-      await controls.start({ x: "-120%", rotate: -30, opacity: 0 });
+      await controls.start({ 
+        x: "-120%", 
+        y: "-10%",
+        rotate: Math.min(-15, rotate), 
+        opacity: 0,
+        transition: { duration: 0.3 }
+      });
       addNotInterested(currentEvent);
       nextCard();
     } else {
-      // Reset position
-      controls.start({ x: 0, rotate: 0 });
+      // Reset position with a spring animation for better feel
+      controls.start({ 
+        x: 0, 
+        y: 0,
+        rotate: 0,
+        transition: { 
+          type: "spring", 
+          stiffness: 500, 
+          damping: 20 
+        }
+      });
     }
   };
   
   const nextCard = () => {
-    controls.start({ x: 0, rotate: 0, opacity: 1 });
+    // Reset animation controls to prepare for next card
+    controls.start({ 
+      x: 0, 
+      rotate: 0, 
+      opacity: 1,
+      scale: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 300,
+        damping: 20 
+      }
+    });
+    
+    // Update to the next card with a small delay to allow animation to complete
     if (currentIndex < remainingEvents.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      setTimeout(() => {
+        setCurrentIndex(currentIndex + 1);
+      }, 300);
     }
   };
   
@@ -107,11 +143,6 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
     await controls.start({ x: "-120%", rotate: -30, opacity: 0 });
     addNotInterested(currentEvent);
     nextCard();
-  };
-  
-  const openEventDetails = (event: Event) => {
-    setSelectedEvent(event);
-    setShowModal(true);
   };
   
   const toggleFilter = () => {
@@ -157,22 +188,44 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         <div className="swipe-indicator-right">👍 Interested</div>
         
         {remainingEvents.length > 0 && currentEvent ? (
-          <motion.div
-            className="absolute inset-0 w-full h-full px-2 py-4"
-            drag="x"
-            dragConstraints={constraintsRef}
-            onDragEnd={handleDragEnd}
-            animate={controls}
-            initial={{ opacity: 1 }}
-            style={{ zIndex: 10 }}
-            whileDrag={{ scale: 1.02 }}
-          >
-            <EventCard 
-              event={currentEvent} 
-              onViewDetails={() => openEventDetails(currentEvent)}
-              drag
-            />
-          </motion.div>
+          <>
+            {/* Next card in stack (shown behind current card) */}
+            {currentIndex < remainingEvents.length - 1 && (
+              <div
+                className="absolute inset-0 w-full h-full px-2 py-4"
+                style={{ 
+                  zIndex: 5, 
+                  transform: 'scale(0.95) translateY(10px)',
+                  opacity: 0.6
+                }}
+              >
+                <EventCard 
+                  event={remainingEvents[currentIndex + 1]} 
+                  drag={false}
+                />
+              </div>
+            )}
+            
+            {/* Current card (top of stack) */}
+            <motion.div
+              className="absolute inset-0 w-full h-full px-2 py-4"
+              drag="x"
+              dragConstraints={constraintsRef}
+              onDragEnd={handleDragEnd}
+              animate={controls}
+              initial={{ opacity: 1, scale: 1, rotate: 0 }}
+              style={{ zIndex: 10 }}
+              whileDrag={{ 
+                scale: 1.02,
+                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              }}
+            >
+              <EventCard 
+                event={currentEvent} 
+                drag
+              />
+            </motion.div>
+          </>
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl shadow p-6 text-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -194,13 +247,6 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
           <X className="h-8 w-8 text-red-500" />
         </button>
         <button 
-          className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
-          onClick={() => currentEvent && openEventDetails(currentEvent)}
-          disabled={!currentEvent}
-        >
-          <Info className="h-6 w-6 text-blue-500" />
-        </button>
-        <button 
           className="w-14 h-14 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
           onClick={handleSwipeRight}
           disabled={!currentEvent}
@@ -208,22 +254,6 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
           <Check className="h-8 w-8 text-green-500" />
         </button>
       </div>
-
-      {selectedEvent && (
-        <EventDetailModal 
-          event={selectedEvent} 
-          isVisible={showModal} 
-          onClose={() => setShowModal(false)} 
-          onInterested={() => {
-            addInterested(selectedEvent);
-            setShowModal(false);
-          }}
-          onNotInterested={() => {
-            addNotInterested(selectedEvent);
-            setShowModal(false);
-          }}
-        />
-      )}
     </div>
   );
 }

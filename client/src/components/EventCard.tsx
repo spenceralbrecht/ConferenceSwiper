@@ -8,7 +8,7 @@ interface EventCardProps {
   drag?: boolean;
 }
 
-export default function EventCard({ event, onViewDetails, drag = false }: EventCardProps) {
+export default function EventCard({ event, onViewDetails = () => {}, drag = false }: EventCardProps) {
   // Convert event type to display-friendly format and determine badge color
   const getTypeBadgeStyle = () => {
     switch (event.type) {
@@ -81,16 +81,19 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
         border: `2px solid ${getCardBorderColor()}`,
       }}
     >
+      {/* Event type header banner instead of image */}
       <div 
-        className="h-40 bg-cover bg-center border-b border-gray-200"
+        className="py-3 px-4 border-b border-gray-200 font-semibold"
         style={{ 
-          backgroundImage: `url('${imageUrl}')`,
-          backgroundColor: '#f0f4f8' // Fallback color if image doesn't load
+          backgroundColor: event.type === 'main' ? '#3b82f6' : '#8b5cf6',
+          color: 'white'
         }}
       >
-        {/* Visual indicator that image is loading */}
-        <div className="h-full w-full flex items-center justify-center text-xs text-gray-500 bg-opacity-70">
-          {event.type === 'main' ? 'Official Event' : 'Side Event'}
+        <div className="flex justify-between items-center">
+          <div>{event.type === 'main' ? 'Official Event' : 'Side Event'}</div>
+          <div className="text-xs font-normal py-1 px-2 bg-white bg-opacity-20 rounded-full">
+            {formatTime(event.startTime)} - {formatTime(event.endTime)}
+          </div>
         </div>
       </div>
       
@@ -144,10 +147,18 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
         {event.additionalData && (() => {
           try {
             const additionalData = JSON.parse(event.additionalData);
-            if (additionalData.action) {
+            if (additionalData.action && additionalData.actionLink) {
               return (
-                <div className="mt-2 text-xs text-blue-500 font-medium">
-                  {additionalData.action} →
+                <div className="mt-4">
+                  <a 
+                    href={additionalData.actionLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {additionalData.action}
+                  </a>
                 </div>
               );
             }
