@@ -158,54 +158,56 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                               <p className="text-sm text-gray-600 mt-2">{event.description}</p>
                               
                               {/* Action Buttons */}
-                              <div className="mt-3 flex justify-between items-center">
+                              <div className="mt-4 flex flex-col justify-center items-center border-t border-gray-100 pt-3">
                                 {/* RSVP Button */}
-                                {event.additionalData && (() => {
-                                  try {
-                                    const data = JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}');
-                                    if (data.action && data.actionLink) {
-                                      const url = data.actionLink.startsWith('http') ? data.actionLink : `https://mauvegas.com/${data.actionLink}`;
-                                      return (
-                                        <a 
-                                          href={url}
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-1 px-3 rounded-md hover:bg-rose-700"
-                                          onClick={(e) => {
-                                            console.log("Clicked RSVP link:", url);
-                                            window.open(url, '_blank');
-                                          }}
-                                        >
-                                          {data.action}
-                                        </a>
-                                      );
-                                    } else if (data.detailsLink) {
-                                      const url = data.detailsLink.startsWith('http') ? data.detailsLink : `https://mauvegas.com/${data.detailsLink}`;
-                                      return (
-                                        <a 
-                                          href={url}
-                                          target="_blank" 
-                                          rel="noopener noreferrer"
-                                          className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-1 px-3 rounded-md hover:bg-rose-700"
-                                          onClick={(e) => {
-                                            console.log("Clicked details link:", url);
-                                            window.open(url, '_blank');
-                                          }}
-                                        >
-                                          Learn More
-                                        </a>
-                                      );
+                                <div className="w-full flex justify-center mb-2">
+                                  {event.additionalData && (() => {
+                                    try {
+                                      const data = JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}');
+                                      if (data.action && data.actionLink) {
+                                        const url = data.actionLink.startsWith('http') ? data.actionLink : `https://mauvegas.com/${data.actionLink}`;
+                                        return (
+                                          <a 
+                                            href={url}
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
+                                            onClick={(e) => {
+                                              console.log("Clicked RSVP link:", url);
+                                              window.open(url, '_blank');
+                                            }}
+                                          >
+                                            {data.action}
+                                          </a>
+                                        );
+                                      } else if (data.detailsLink) {
+                                        const url = data.detailsLink.startsWith('http') ? data.detailsLink : `https://mauvegas.com/${data.detailsLink}`;
+                                        return (
+                                          <a 
+                                            href={url}
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
+                                            onClick={(e) => {
+                                              console.log("Clicked details link:", url);
+                                              window.open(url, '_blank');
+                                            }}
+                                          >
+                                            Learn More
+                                          </a>
+                                        );
+                                      }
+                                      return null;
+                                    } catch (e) {
+                                      console.error("Error parsing additionalData:", e);
+                                      return null;
                                     }
-                                    return null;
-                                  } catch (e) {
-                                    console.error("Error parsing additionalData:", e);
-                                    return null;
-                                  }
-                                })()}
+                                  })()}
+                                </div>
                                 
                                 {/* Remove Button */}
                                 <button 
-                                  className="inline-flex items-center text-sm font-medium text-rose-600 hover:text-rose-800"
+                                  className="inline-flex items-center text-sm font-medium text-rose-600 hover:text-rose-800 mt-1"
                                   onClick={() => handleRemoveEvent(event.id)}
                                 >
                                   <X className="h-4 w-4 mr-1" />

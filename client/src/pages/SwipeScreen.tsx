@@ -227,21 +227,28 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         )}
       </div>
 
-      <div className="flex justify-center space-x-8 py-3 mb-4 mt-2 bg-white rounded-full shadow mx-auto max-w-xs border border-gray-100">
-        <button 
-          className="w-16 h-16 flex items-center justify-center bg-red-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-red-600 active:scale-95 transition-transform"
-          onClick={handleSwipeLeft}
-          disabled={!currentEvent}
-        >
-          <X className="h-8 w-8" />
-        </button>
-        <button 
-          className="w-16 h-16 flex items-center justify-center bg-green-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-green-600 active:scale-95 transition-transform"
-          onClick={handleSwipeRight}
-          disabled={!currentEvent}
-        >
-          <Check className="h-8 w-8" />
-        </button>
+      <div className="flex justify-center items-center py-3 mb-4 mt-2 bg-white rounded-xl shadow mx-auto max-w-xs border border-gray-100">
+        <div className="flex flex-col items-center mx-4">
+          <button 
+            className="w-16 h-16 flex items-center justify-center bg-red-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-red-600 active:scale-95 transition-transform mb-2"
+            onClick={handleSwipeLeft}
+            disabled={!currentEvent}
+          >
+            <X className="h-8 w-8" />
+          </button>
+          <span className="text-xs font-semibold text-gray-600">NOT INTERESTED</span>
+        </div>
+        
+        <div className="flex flex-col items-center mx-4">
+          <button 
+            className="w-16 h-16 flex items-center justify-center bg-green-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-green-600 active:scale-95 transition-transform mb-2"
+            onClick={handleSwipeRight}
+            disabled={!currentEvent}
+          >
+            <Check className="h-8 w-8" />
+          </button>
+          <span className="text-xs font-semibold text-gray-600">INTERESTED</span>
+        </div>
       </div>
     </div>
   );

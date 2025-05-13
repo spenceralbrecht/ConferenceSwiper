@@ -130,14 +130,14 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
           {event.description}
         </div>
         
-        <div className="flex flex-wrap justify-between items-center mt-4 pt-2 border-t border-gray-100">
+        <div className="flex flex-col mt-6 pt-3 border-t border-gray-100">
           {/* Show sponsor information if available */}
           {event.additionalData && (() => {
             try {
               const additionalData = JSON.parse(event.additionalData);
               if (additionalData.sponsors) {
                 return (
-                  <div className="text-xs text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-full">
+                  <div className="text-xs text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-full self-start mb-2">
                     Sponsored by {additionalData.sponsors}
                   </div>
                 );
@@ -149,61 +149,56 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
           })()}
           
           {/* Add action button indicator if available */}
-          {event.additionalData && (() => {
-            try {
-              const additionalData = JSON.parse(event.additionalData);
-              if (additionalData.action && additionalData.actionLink) {
-                return (
-                  <a 
-                    href={additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-sm ml-auto"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const url = additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`;
-                      console.log("Clicked RSVP link:", url);
-                      window.open(url, '_blank');
-                    }}
-                  >
-                    {additionalData.action}
-                  </a>
-                );
+          <div className="flex justify-center w-full my-2">
+            {event.additionalData && (() => {
+              try {
+                const additionalData = JSON.parse(event.additionalData);
+                if (additionalData.action && additionalData.actionLink) {
+                  return (
+                    <a 
+                      href={additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const url = additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`;
+                        console.log("Clicked RSVP link:", url);
+                        window.open(url, '_blank');
+                      }}
+                    >
+                      {additionalData.action}
+                    </a>
+                  );
+                }
+                
+                // Show a generic RSVP button if no action but we have detailsLink
+                if (!additionalData.action && additionalData.detailsLink) {
+                  return (
+                    <a 
+                      href={additionalData.detailsLink.startsWith('http') ? additionalData.detailsLink : `https://mauvegas.com/${additionalData.detailsLink}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const url = additionalData.detailsLink.startsWith('http') ? additionalData.detailsLink : `https://mauvegas.com/${additionalData.detailsLink}`;
+                        console.log("Clicked details link:", url);
+                        window.open(url, '_blank');
+                      }}
+                    >
+                      Learn More
+                    </a>
+                  );
+                }
+                
+                return null;
+              } catch (e) {
+                console.error("Error parsing additionalData:", e);
+                return null;
               }
-              return null;
-            } catch (e) {
-              console.error("Error parsing additionalData:", e);
-              return null;
-            }
-          })()}
-          
-          {/* Show a generic RSVP button if no action but we have detailsLink */}
-          {event.additionalData && (() => {
-            try {
-              const additionalData = JSON.parse(event.additionalData);
-              if (!additionalData.action && additionalData.detailsLink) {
-                return (
-                  <a 
-                    href={additionalData.detailsLink.startsWith('http') ? additionalData.detailsLink : `https://mauvegas.com/${additionalData.detailsLink}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-sm ml-auto"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const url = additionalData.detailsLink.startsWith('http') ? additionalData.detailsLink : `https://mauvegas.com/${additionalData.detailsLink}`;
-                      console.log("Clicked details link:", url);
-                      window.open(url, '_blank');
-                    }}
-                  >
-                    Learn More
-                  </a>
-                );
-              }
-              return null;
-            } catch (e) {
-              return null;
-            }
-          })()}
+            })()}
+          </div>
         </div>
       </div>
       
