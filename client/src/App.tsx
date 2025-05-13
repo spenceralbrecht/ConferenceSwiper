@@ -45,7 +45,7 @@ function Router() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden" style={{ minHeight: "calc(100vh - 160px)" }}>
+      <main className="flex-1 overflow-hidden pb-16" style={{ minHeight: "calc(100vh - 160px)" }}>
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

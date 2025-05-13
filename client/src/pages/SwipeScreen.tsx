@@ -171,7 +171,7 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         onFilterChange={setActiveFilters} 
       />
 
-      <div className="swipe-container relative flex-1 mx-4 mb-1 rounded-xl overflow-hidden border border-gray-200" ref={constraintsRef}>
+      <div className="swipe-container relative flex-1 mx-4 mb-1 rounded-xl overflow-hidden border border-gray-200" style={{ maxHeight: "calc(100vh - 200px)" }} ref={constraintsRef}>
         
         {/* Swipe indicators */}
         <div className="swipe-indicator-left">👎 Not Interested</div>
@@ -227,7 +227,7 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         )}
       </div>
 
-      <div className="flex justify-center space-x-6 pb-3 pt-1">
+      <div className="flex justify-center space-x-6 pb-5 pt-1">
         <button 
           className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
           onClick={handleSwipeLeft}

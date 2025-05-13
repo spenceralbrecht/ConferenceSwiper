@@ -80,7 +80,7 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
   }
 
   return (
-    <div className="h-full p-4 overflow-auto pb-16">
+    <div className="h-full p-4 overflow-auto pb-20">
       <div className="mb-4">
         <h2 className="text-xl font-bold text-gray-800">My Schedule</h2>
         <p className="text-sm text-gray-500">
