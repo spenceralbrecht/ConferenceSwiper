@@ -58,8 +58,9 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
 
   return (
     <div 
-      className="rounded-xl bg-white shadow-lg overflow-hidden h-full"
+      className="rounded-xl bg-white shadow-lg overflow-hidden h-full relative"
       onClick={onViewDetails}
+      style={{ minHeight: "500px" }}
     >
       <div 
         className="h-40 bg-cover bg-center"

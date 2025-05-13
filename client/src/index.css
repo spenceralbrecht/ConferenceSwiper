@@ -56,3 +56,20 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Custom styles for the swipe screen */
+.action-interested {
+  transition: opacity 0.3s ease;
+}
+
+.action-not-interested {
+  transition: opacity 0.3s ease;
+}
+
+/* Make the swipe container have proper height */
+.swipe-container {
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

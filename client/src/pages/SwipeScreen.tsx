@@ -39,11 +39,15 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
   const controls = useAnimation();
   const constraintsRef = useRef(null);
   
-  // Filter events based on user preferences
+  // Filter events based on user preferences and add debugging
   useEffect(() => {
+    console.log("Events passed to SwipeScreen:", events.length);
+    
     const filtered = events.filter(
       (event) => activeFilters[event.type as keyof typeof activeFilters]
     );
+    
+    console.log("Events after filter:", filtered.length);
     setViewableEvents(filtered);
   }, [events, activeFilters]);
   
@@ -51,7 +55,11 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
     (event) => !isEventRated(event.id)
   );
   
+  console.log("Remaining events to swipe:", remainingEvents.length);
+  
   const currentEvent = remainingEvents[currentIndex];
+  
+  console.log("Current event:", currentEvent);
   
   const handleDragEnd = async (
     _: any,
@@ -110,6 +118,15 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
     setShowFilter(!showFilter);
   };
 
+  // Debug output for our app state
+  console.log("Event Card Debug:", {
+    totalEvents: events.length,
+    filteredEvents: viewableEvents.length,
+    remainingEvents: remainingEvents.length,
+    currentIndex: currentIndex,
+    currentEvent: currentEvent ? currentEvent.title : 'No current event'
+  });
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex justify-between items-center px-4 py-2">
@@ -132,12 +149,13 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
       <div className="relative flex-1 mx-4 mb-4 rounded-xl overflow-hidden" ref={constraintsRef}>
         {remainingEvents.length > 0 && currentEvent ? (
           <motion.div
-            className="absolute w-full h-full"
+            className="absolute inset-0 w-full h-full"
             drag="x"
             dragConstraints={constraintsRef}
             onDragEnd={handleDragEnd}
             animate={controls}
             initial={{ opacity: 1 }}
+            style={{ zIndex: 10 }}
           >
             <EventCard 
               event={currentEvent} 
