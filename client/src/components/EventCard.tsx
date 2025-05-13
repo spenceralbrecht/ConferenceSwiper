@@ -130,7 +130,7 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
           {event.description}
         </div>
         
-        <div className="flex flex-wrap gap-2 mt-auto">
+        <div className="flex flex-wrap justify-between items-center mt-4 pt-2 border-t border-gray-100">
           {/* Show sponsor information if available */}
           {event.additionalData && (() => {
             try {
@@ -158,10 +158,40 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
                     href={additionalData.actionLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-block bg-rose-500 hover:bg-rose-600 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-sm"
-                    onClick={(e) => e.stopPropagation()}
+                    className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-sm ml-auto"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("Clicked RSVP link:", additionalData.actionLink);
+                    }}
                   >
                     {additionalData.action}
+                  </a>
+                );
+              }
+              return null;
+            } catch (e) {
+              console.error("Error parsing additionalData:", e);
+              return null;
+            }
+          })()}
+          
+          {/* Show a generic RSVP button if no action but we have detailsLink */}
+          {event.additionalData && (() => {
+            try {
+              const additionalData = JSON.parse(event.additionalData);
+              if (!additionalData.action && additionalData.detailsLink) {
+                return (
+                  <a 
+                    href={additionalData.detailsLink.startsWith('http') ? additionalData.detailsLink : `https://mauvegas.com/${additionalData.detailsLink}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-sm ml-auto"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log("Clicked details link:", additionalData.detailsLink);
+                    }}
+                  >
+                    Learn More
                   </a>
                 );
               }

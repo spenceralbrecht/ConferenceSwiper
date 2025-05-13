@@ -158,7 +158,20 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                               <p className="text-sm text-gray-600 mt-2">{event.description}</p>
                               
                               {/* Action Buttons */}
-                              <div className="mt-3 flex justify-end">
+                              <div className="mt-3 flex justify-between items-center">
+                                {/* RSVP Button */}
+                                {event.additionalData && (
+                                  <a 
+                                    href={JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}').actionLink || '#'}
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-1 px-3 rounded-md hover:bg-rose-700"
+                                  >
+                                    {JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}').action || 'RSVP'}
+                                  </a>
+                                )}
+                                
+                                {/* Remove Button */}
                                 <button 
                                   className="inline-flex items-center text-sm font-medium text-rose-600 hover:text-rose-800"
                                   onClick={() => handleRemoveEvent(event.id)}
