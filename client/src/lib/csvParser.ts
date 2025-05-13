@@ -23,7 +23,7 @@ function parseCSV(csvText: string): Event[] {
   const parseResult = Papa.parse(csvText, {
     header: true,
     skipEmptyLines: true,
-    dynamicTyping: true
+    dynamicTyping: false // Keep everything as strings
   });
   
   if (parseResult.errors.length > 0) {
@@ -32,24 +32,47 @@ function parseCSV(csvText: string): Event[] {
   
   // Map CSV data to Event objects
   const events: Event[] = parseResult.data.map((row: any, index: number) => {
-    // Split speakers string into array if it exists
-    const speakers = row.speakers ? row.speakers.split(',').map((s: string) => s.trim()) : [];
+    // Parse time field which is in format "HH:MM–HH:MM"
+    let startTime = "00:00";
+    let endTime = "00:00";
     
-    // Transform row data to Event object
+    if (row.Time && row.Time.includes("–")) {
+      const timeParts = row.Time.split("–");
+      startTime = timeParts[0].trim();
+      endTime = timeParts[1].trim();
+    }
+    
+    // Map the MAU Vegas CSV columns to our Event schema
     return {
-      id: row.id || index + 1,
-      title: row.title || `Untitled Event ${index + 1}`,
-      description: row.description || "No description provided",
-      date: row.date || new Date().toISOString().split('T')[0],
-      startTime: row.startTime || "00:00",
-      endTime: row.endTime || "01:00",
-      location: row.location || "TBD",
-      type: row.type || "other",
-      imageUrl: row.imageUrl || "",
-      speakers: speakers,
+      id: index + 1,
+      title: row["Event Name"] || `Untitled Event ${index + 1}`,
+      description: row.Description || "No description provided",
+      date: row.Date || new Date().toISOString().split('T')[0],
+      startTime: startTime,
+      endTime: endTime,
+      location: row.Location || "TBD",
+      // Map "Main" and "Side" to our event type enum
+      type: mapEventType(row.Type),
+      imageUrl: "", // No images in the CSV
+      speakers: [], // No speakers specifically listed
     };
   });
   
   console.log(`Parsed ${events.length} events from CSV`);
   return events;
+}
+
+// Map MAU event types to our schema's event types
+function mapEventType(type: string): "main" | "workshop" | "panel" | "networking" | "breakout" | "other" {
+  if (!type) return "other";
+  
+  switch (type.toLowerCase()) {
+    case "main":
+      return "main";
+    case "side":
+      // We'll categorize "Side" events as "networking" for better visual distinction
+      return "networking";
+    default:
+      return "other";
+  }
 }
