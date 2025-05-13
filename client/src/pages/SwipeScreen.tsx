@@ -227,20 +227,20 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         )}
       </div>
 
-      <div className="flex justify-center space-x-6 pb-2 pt-1">
+      <div className="flex justify-center space-x-8 pb-2 pt-1">
         <button 
-          className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
+          className="w-14 h-14 flex items-center justify-center bg-red-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-red-600 active:scale-95 transition-transform"
           onClick={handleSwipeLeft}
           disabled={!currentEvent}
         >
-          <X className="h-7 w-7 text-red-500" />
+          <X className="h-8 w-8" />
         </button>
         <button 
-          className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
+          className="w-14 h-14 flex items-center justify-center bg-green-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-green-600 active:scale-95 transition-transform"
           onClick={handleSwipeRight}
           disabled={!currentEvent}
         >
-          <Check className="h-7 w-7 text-green-500" />
+          <Check className="h-8 w-8" />
         </button>
       </div>
     </div>
