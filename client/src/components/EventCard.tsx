@@ -91,9 +91,43 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
           <span className="line-clamp-1">{event.location}</span>
         </div>
         
-        <div className="mt-3 text-gray-600 text-sm line-clamp-2">
+        {/* Show sponsor information if available */}
+        {event.additionalData && (() => {
+          try {
+            const additionalData = JSON.parse(event.additionalData);
+            if (additionalData.sponsors) {
+              return (
+                <div className="mt-2 text-xs text-gray-400 italic">
+                  Sponsored by {additionalData.sponsors}
+                </div>
+              );
+            }
+            return null;
+          } catch (e) {
+            return null;
+          }
+        })()}
+        
+        <div className="mt-2 text-gray-600 text-sm line-clamp-2">
           {event.description}
         </div>
+        
+        {/* Add action button indicator if available */}
+        {event.additionalData && (() => {
+          try {
+            const additionalData = JSON.parse(event.additionalData);
+            if (additionalData.action) {
+              return (
+                <div className="mt-2 text-xs text-blue-500 font-medium">
+                  {additionalData.action} →
+                </div>
+              );
+            }
+            return null;
+          } catch (e) {
+            return null;
+          }
+        })()}
       </div>
       
       {/* Action Overlays for swipe gestures */}

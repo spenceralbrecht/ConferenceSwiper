@@ -39,6 +39,7 @@ export const events = pgTable("events", {
   type: eventTypeEnum("type").notNull().default("other"),
   imageUrl: text("image_url"),
   speakers: text("speakers").array(), // Array of speaker names
+  additionalData: text("additional_data"), // JSON string for action links, sponsors, etc.
 });
 
 export const insertEventSchema = createInsertSchema(events).omit({

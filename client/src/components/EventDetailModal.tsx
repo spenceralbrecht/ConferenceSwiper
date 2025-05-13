@@ -122,6 +122,32 @@ export default function EventDetailModal({
             </p>
           </div>
           
+          {/* Action buttons from the CSV data */}
+          {event.additionalData && (
+            <div className="mb-4">
+              {(() => {
+                try {
+                  const additionalData = JSON.parse(event.additionalData);
+                  if (additionalData.action && additionalData.actionLink) {
+                    return (
+                      <a 
+                        href={additionalData.actionLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded text-center mb-3"
+                      >
+                        {additionalData.action}
+                      </a>
+                    );
+                  }
+                  return null;
+                } catch (e) {
+                  return null;
+                }
+              })()}
+            </div>
+          )}
+          
           <div className="flex space-x-3">
             {isScheduled ? (
               <Button 
