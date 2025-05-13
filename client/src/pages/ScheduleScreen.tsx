@@ -3,7 +3,6 @@ import { Event } from "@shared/schema";
 import { useSchedule } from "@/hooks/use-schedule";
 import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
-import EventDetailModal from "@/components/EventDetailModal";
 import TimeConflictBadge from "@/components/TimeConflictBadge";
 import { checkTimeConflict } from "@/lib/utils";
 import { X, Clock, MapPin, Calendar } from "lucide-react";
@@ -16,54 +15,56 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
   console.log("ScheduleScreen component mounted");
   
   const { interestedEvents, removeInterested } = useSchedule();
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [showModal, setShowModal] = useState(false);
   
   // Get all interested events objects
   const scheduledEvents = events.filter((event) => 
     interestedEvents.includes(event.id)
   );
   
-  // Extract unique dates from the scheduled events
-  const uniqueDatesSet = new Set(scheduledEvents.map(event => event.date));
-  const uniqueDates = Array.from(uniqueDatesSet).sort();
-  
-  useEffect(() => {
-    if (uniqueDates.length > 0 && !selectedDate) {
-      setSelectedDate(uniqueDates[0]);
+  // Group events by date
+  const eventsByDate = scheduledEvents.reduce<Record<string, Event[]>>((acc, event) => {
+    if (!acc[event.date]) {
+      acc[event.date] = [];
     }
-  }, [uniqueDates, selectedDate]);
+    acc[event.date].push(event);
+    return acc;
+  }, {});
   
-  // Filter events by selected date
-  const eventsForSelectedDate = scheduledEvents.filter(
-    (event) => event.date === selectedDate
-  );
+  // Sort dates chronologically
+  const sortedDates = Object.keys(eventsByDate).sort();
   
-  // Sort events by start time
-  const sortedEvents = [...eventsForSelectedDate].sort((a, b) => {
-    // Convert time strings to minutes since midnight for comparison
-    const aMinutes = timeStringToMinutes(a.startTime);
-    const bMinutes = timeStringToMinutes(b.startTime);
-    return aMinutes - bMinutes;
-  });
-  
-  // Check for time conflicts
-  const eventsWithConflicts = sortedEvents.map(event => {
-    const conflicts = eventsForSelectedDate.filter(
-      otherEvent => 
-        event.id !== otherEvent.id && 
-        checkTimeConflict(
-          event.startTime, 
-          event.endTime, 
-          otherEvent.startTime, 
-          otherEvent.endTime
-        )
-    );
+  // For each date, sort events by start time and check for conflicts
+  const processedEventsByDate = sortedDates.map(date => {
+    // Sort events by start time
+    const sortedEvents = [...eventsByDate[date]].sort((a, b) => {
+      const aMinutes = timeStringToMinutes(a.startTime);
+      const bMinutes = timeStringToMinutes(b.startTime);
+      return aMinutes - bMinutes;
+    });
+    
+    // Check for time conflicts
+    const eventsWithConflicts = sortedEvents.map(event => {
+      const conflicts = eventsByDate[date].filter(
+        otherEvent => 
+          event.id !== otherEvent.id && 
+          checkTimeConflict(
+            event.startTime, 
+            event.endTime, 
+            otherEvent.startTime, 
+            otherEvent.endTime
+          )
+      );
+      return {
+        ...event,
+        hasConflict: conflicts.length > 0,
+        conflictingEvents: conflicts
+      };
+    });
+    
     return {
-      ...event,
-      hasConflict: conflicts.length > 0,
-      conflictingEvents: conflicts
+      date,
+      formattedDate: formatDateHeader(date),
+      events: eventsWithConflicts
     };
   });
   
@@ -72,106 +73,111 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
     removeInterested(eventId);
   };
   
-  const openEventDetails = (event: Event) => {
-    setSelectedEvent(event);
-    setShowModal(true);
-  };
-  
   // Format date for display in header
-  const formatDateHeader = (dateStr: string | null) => {
-    if (!dateStr) return "";
+  function formatDateHeader(dateStr: string) {
     const date = new Date(dateStr);
     return date.toLocaleDateString("en-US", { weekday: 'long', month: "long", day: "numeric", year: "numeric" });
-  };
+  }
 
   return (
-    <div className="h-full p-4">
+    <div className="h-full p-4 overflow-auto pb-16">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">My Schedule</h2>
+        <h2 className="text-xl font-bold text-gray-800">My Schedule</h2>
         <p className="text-sm text-gray-500">
-          You have selected <span className="font-medium">{scheduledEvents.length}</span> events
+          You have {scheduledEvents.length} events scheduled
         </p>
       </div>
       
       {scheduledEvents.length > 0 ? (
-        <>
-          {/* Date Navigation */}
-          <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
-            {uniqueDates.map((date) => (
-              <Button
-                key={date}
-                variant={selectedDate === date ? "default" : "outline"}
-                className={selectedDate === date ? "bg-primary" : ""}
-                onClick={() => setSelectedDate(date)}
-              >
-                {format(parseISO(date), "MMM d")}
-              </Button>
-            ))}
-          </div>
-          
-          {/* Selected Date Header */}
-          {selectedDate && (
-            <div className="flex items-center mb-3 text-sm font-medium text-gray-700">
-              <Calendar className="h-4 w-4 mr-2" />
-              {formatDateHeader(selectedDate)}
-            </div>
-          )}
-          
-          {/* Schedule List */}
-          <div className="space-y-3 overflow-auto" style={{ maxHeight: 'calc(100vh - 240px)' }}>
-            {eventsWithConflicts.length > 0 ? (
-              eventsWithConflicts.map((event) => {
-                // Determine if this is a MAU Vegas event
-                const isMauEvent = event.date.startsWith('2025-05');
-                
-                // Get the appropriate event type label
-                const eventTypeLabel = isMauEvent 
-                  ? (event.type === 'main' ? 'Official Event' : 'Side Event')
-                  : capitalizeFirstLetter(event.type);
-                
-                return (
-                  <div 
-                    key={event.id} 
-                    className={`bg-white rounded-lg shadow p-3 border-l-4 ${event.hasConflict ? "border-red-500" : "border-primary"} ${event.hasConflict ? "animate-pulse" : ""}`}
-                    onClick={() => openEventDetails(event)}
-                  >
-                    <div className="flex justify-between">
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`inline-block ${getTypeBadgeColor(event.type)} text-xs px-2 py-0.5 rounded-full`}>
-                            {eventTypeLabel}
-                          </span>
-                          {event.hasConflict && <TimeConflictBadge />}
-                        </div>
-                        <h3 className="text-base font-medium mt-1">{event.title}</h3>
-                      </div>
-                      <button 
-                        className="text-gray-400 hover:text-gray-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRemoveEvent(event.id);
-                        }}
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
-                    </div>
-                    <div className="mt-1 flex items-center text-sm text-gray-500">
-                      <Clock className="h-4 w-4 mr-1 flex-shrink-0" />
-                      <span>{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
-                      <span className="mx-2">•</span>
-                      <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
-                      <span className="truncate">{event.location}</span>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                No events scheduled for this date.
+        <div className="space-y-8">
+          {processedEventsByDate.map(({ date, formattedDate, events }) => (
+            <div key={date} className="mb-6">
+              {/* Date Header */}
+              <div className="sticky top-0 z-10 bg-white py-2 mb-3 border-b border-gray-200">
+                <h3 className="flex items-center text-lg font-semibold text-gray-900">
+                  <Calendar className="h-5 w-5 mr-2 text-rose-500" />
+                  {formattedDate}
+                </h3>
               </div>
-            )}
-          </div>
-        </>
+              
+              {/* Timeline */}
+              <div className="relative pl-8 border-l-2 border-gray-100">
+                {events.map((event, index) => {
+                  // Determine styles based on event type
+                  const isMauEvent = event.date.startsWith('2025-05');
+                  const eventTypeLabel = isMauEvent 
+                    ? (event.type === 'main' ? 'Official Event' : 'Side Event')
+                    : capitalizeFirstLetter(event.type);
+                  
+                  // Colors for event type - using Airbnb-inspired colors
+                  const typeColors = {
+                    main: "bg-rose-100 text-rose-800 border-rose-500",
+                    workshop: "bg-teal-100 text-teal-800 border-teal-500",
+                    panel: "bg-amber-100 text-amber-800 border-amber-500",
+                    networking: "bg-cyan-100 text-cyan-800 border-cyan-500",
+                    breakout: "bg-fuchsia-100 text-fuchsia-800 border-fuchsia-500",
+                    other: "bg-slate-100 text-slate-800 border-slate-500"
+                  };
+                  
+                  const colorClass = typeColors[event.type as keyof typeof typeColors] || typeColors.other;
+                  
+                  return (
+                    <div key={event.id} className="mb-6 relative">
+                      {/* Timeline dot */}
+                      <div 
+                        className={`absolute -left-10 w-4 h-4 rounded-full mt-1.5 ${event.type === 'main' ? 'bg-rose-500' : 'bg-teal-500'}`}
+                      ></div>
+                      
+                      {/* Timeline card */}
+                      <div 
+                        className={`bg-white rounded-lg shadow-md border-l-4 ${event.hasConflict ? "border-red-500" : colorClass.split(' ')[2]}`}
+                      >
+                        <div className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <span className={`inline-block px-2 py-1 rounded-md text-xs font-medium ${colorClass.split(' ').slice(0, 2).join(' ')}`}>
+                                  {eventTypeLabel}
+                                </span>
+                                {event.hasConflict && <TimeConflictBadge />}
+                              </div>
+                              <h4 className="text-lg font-bold text-gray-900 mb-2">{event.title}</h4>
+                              
+                              <div className="space-y-1 mb-2">
+                                <div className="flex items-center text-sm text-gray-700">
+                                  <Clock className="h-4 w-4 mr-2 text-rose-500" />
+                                  <span className="font-medium">{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
+                                </div>
+                                <div className="flex items-start text-sm text-gray-700">
+                                  <MapPin className="h-4 w-4 mr-2 mt-0.5 text-rose-500" />
+                                  <span className="font-medium">{event.location}</span>
+                                </div>
+                              </div>
+                              
+                              {/* Description */}
+                              <p className="text-sm text-gray-600 mt-2">{event.description}</p>
+                              
+                              {/* Action Buttons */}
+                              <div className="mt-3 flex justify-end">
+                                <button 
+                                  className="inline-flex items-center text-sm font-medium text-rose-600 hover:text-rose-800"
+                                  onClick={() => handleRemoveEvent(event.id)}
+                                >
+                                  <X className="h-4 w-4 mr-1" />
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="py-10 text-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -181,19 +187,6 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
           <p className="mt-1 text-sm text-gray-500">Start swiping to build your schedule</p>
         </div>
       )}
-      
-      {selectedEvent && (
-        <EventDetailModal 
-          event={selectedEvent} 
-          isVisible={showModal} 
-          onClose={() => setShowModal(false)} 
-          isScheduled={true}
-          onRemove={() => {
-            removeInterested(selectedEvent.id);
-            setShowModal(false);
-          }}
-        />
-      )}
     </div>
   );
 }
@@ -202,23 +195,6 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
 function timeStringToMinutes(timeStr: string): number {
   const [hours, minutes] = timeStr.split(":").map(Number);
   return hours * 60 + minutes;
-}
-
-function getTypeBadgeColor(type: string): string {
-  switch (type) {
-    case "main":
-      return "bg-blue-100 text-blue-800";
-    case "workshop":
-      return "bg-green-100 text-green-800";
-    case "panel":
-      return "bg-yellow-100 text-yellow-800";
-    case "networking":
-      return "bg-purple-100 text-purple-800";
-    case "breakout":
-      return "bg-orange-100 text-orange-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
 }
 
 function capitalizeFirstLetter(string: string): string {

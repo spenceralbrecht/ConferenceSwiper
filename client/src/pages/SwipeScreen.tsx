@@ -172,10 +172,6 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
       />
 
       <div className="swipe-container relative flex-1 mx-4 mb-1 rounded-xl overflow-hidden border border-gray-200" ref={constraintsRef}>
-        {/* Event count indicator (moved to top-right corner) */}
-        <div className="absolute top-2 right-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full z-50 opacity-70">
-          {remainingEvents.length} events
-        </div>
         
         {/* Swipe indicators */}
         <div className="swipe-indicator-left">👎 Not Interested</div>
