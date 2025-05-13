@@ -227,16 +227,16 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         )}
       </div>
 
-      <div className="flex justify-center space-x-8 pb-2 pt-1">
+      <div className="flex justify-center space-x-8 py-3 mb-4 mt-2 bg-white rounded-full shadow mx-auto max-w-xs border border-gray-100">
         <button 
-          className="w-14 h-14 flex items-center justify-center bg-red-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-red-600 active:scale-95 transition-transform"
+          className="w-16 h-16 flex items-center justify-center bg-red-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-red-600 active:scale-95 transition-transform"
           onClick={handleSwipeLeft}
           disabled={!currentEvent}
         >
           <X className="h-8 w-8" />
         </button>
         <button 
-          className="w-14 h-14 flex items-center justify-center bg-green-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-green-600 active:scale-95 transition-transform"
+          className="w-16 h-16 flex items-center justify-center bg-green-500 rounded-full shadow-lg border-2 border-white text-white hover:bg-green-600 active:scale-95 transition-transform"
           onClick={handleSwipeRight}
           disabled={!currentEvent}
         >

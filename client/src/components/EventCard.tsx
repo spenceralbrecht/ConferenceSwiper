@@ -155,13 +155,15 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
               if (additionalData.action && additionalData.actionLink) {
                 return (
                   <a 
-                    href={additionalData.actionLink} 
+                    href={additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-sm ml-auto"
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log("Clicked RSVP link:", additionalData.actionLink);
+                      const url = additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`;
+                      console.log("Clicked RSVP link:", url);
+                      window.open(url, '_blank');
                     }}
                   >
                     {additionalData.action}
@@ -188,7 +190,9 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
                     className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-sm ml-auto"
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log("Clicked details link:", additionalData.detailsLink);
+                      const url = additionalData.detailsLink.startsWith('http') ? additionalData.detailsLink : `https://mauvegas.com/${additionalData.detailsLink}`;
+                      console.log("Clicked details link:", url);
+                      window.open(url, '_blank');
                     }}
                   >
                     Learn More

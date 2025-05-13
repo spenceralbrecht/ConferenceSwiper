@@ -160,16 +160,48 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                               {/* Action Buttons */}
                               <div className="mt-3 flex justify-between items-center">
                                 {/* RSVP Button */}
-                                {event.additionalData && (
-                                  <a 
-                                    href={JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}').actionLink || '#'}
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-1 px-3 rounded-md hover:bg-rose-700"
-                                  >
-                                    {JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}').action || 'RSVP'}
-                                  </a>
-                                )}
+                                {event.additionalData && (() => {
+                                  try {
+                                    const data = JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}');
+                                    if (data.action && data.actionLink) {
+                                      const url = data.actionLink.startsWith('http') ? data.actionLink : `https://mauvegas.com/${data.actionLink}`;
+                                      return (
+                                        <a 
+                                          href={url}
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-1 px-3 rounded-md hover:bg-rose-700"
+                                          onClick={(e) => {
+                                            console.log("Clicked RSVP link:", url);
+                                            window.open(url, '_blank');
+                                          }}
+                                        >
+                                          {data.action}
+                                        </a>
+                                      );
+                                    } else if (data.detailsLink) {
+                                      const url = data.detailsLink.startsWith('http') ? data.detailsLink : `https://mauvegas.com/${data.detailsLink}`;
+                                      return (
+                                        <a 
+                                          href={url}
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-1 px-3 rounded-md hover:bg-rose-700"
+                                          onClick={(e) => {
+                                            console.log("Clicked details link:", url);
+                                            window.open(url, '_blank');
+                                          }}
+                                        >
+                                          Learn More
+                                        </a>
+                                      );
+                                    }
+                                    return null;
+                                  } catch (e) {
+                                    console.error("Error parsing additionalData:", e);
+                                    return null;
+                                  }
+                                })()}
                                 
                                 {/* Remove Button */}
                                 <button 
