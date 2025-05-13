@@ -19,11 +19,19 @@ export async function loadEvents(): Promise<Event[]> {
 
 // Parse CSV data into Event objects
 function parseCSV(csvText: string): Event[] {
+  console.log("CSV Text starts with:", csvText.substring(0, 100));
+  
   // Parse CSV string to objects
   const parseResult = Papa.parse(csvText, {
     header: true,
     skipEmptyLines: true,
     dynamicTyping: false // Keep everything as strings
+  });
+  
+  console.log("CSV Parse Result:", {
+    rowCount: parseResult.data.length,
+    headers: parseResult.meta.fields,
+    firstTwoRows: parseResult.data.slice(0, 2)
   });
   
   if (parseResult.errors.length > 0) {
@@ -34,31 +42,61 @@ function parseCSV(csvText: string): Event[] {
   const uniqueEvents = new Map<string, any>();
   
   // Process each row and store by unique title+date+time key
-  parseResult.data.forEach((row: any) => {
-    // Skip empty rows
-    if (!row["Event Name"]) return;
+  parseResult.data.forEach((row: any, index: number) => {
+    // Skip empty rows or rows with missing critical data
+    if (!row["Event Name"] || !row.Date) {
+      console.log("Skipping incomplete row:", row);
+      return;
+    }
     
-    // Create a unique key for this event
-    const eventKey = `${row["Event Name"]}_${row.Date}_${row.StartTime || row.Time || ""}`;
+    // Create a unique key for this event - use Date and Event Name since StartTime can be in different formats
+    const eventKey = `${row["Event Name"]}_${row.Date}`;
+    
+    console.log(`Row ${index}:`, {
+      name: row["Event Name"], 
+      date: row.Date,
+      type: row.Type,
+      key: eventKey
+    });
     
     // If this event is already in our map
     if (uniqueEvents.has(eventKey)) {
       const existingEvent = uniqueEvents.get(eventKey);
       
-      // Merge information from both entries (prefer Main over Side where applicable)
-      if (row.Type === "Main" && existingEvent.type !== "Main") {
-        // If this is the Main entry and the existing is Side, update description and other fields
-        existingEvent.description = row.Description || existingEvent.description;
-        existingEvent.type = row.Type;
+      // If we have both a Main and Side entry, merge them intelligently
+      if (row.Type === "Main" && existingEvent.Type === "Side") {
+        // Update basic info from Main entry
+        existingEvent.Description = row.Description || existingEvent.Description;
+        existingEvent.Location = row.Location || existingEvent.Location;
+        existingEvent.Type = "Main"; // Keep the Main type
+        
+        // Keep the action links from Side entry if they exist
+        if (!existingEvent.Action) existingEvent.Action = row.Action;
+        if (!existingEvent["Action Link"]) existingEvent["Action Link"] = row["Action Link"];
       }
-      
-      // Add action links from Side entries
-      if (row.Type === "Side" && row["Action Link"]) {
-        existingEvent.actionLink = row["Action Link"];
-        existingEvent.action = row.Action;
+      else if (row.Type === "Side" && existingEvent.Type === "Main") {
+        // Add action links from Side entry while preserving Main data
+        existingEvent.Action = row.Action || existingEvent.Action;
+        existingEvent["Action Link"] = row["Action Link"] || existingEvent["Action Link"];
+        // Don't override main description or location
+      }
+      else {
+        // If both are the same type, prefer the one with more data
+        if (!existingEvent.Description && row.Description) {
+          existingEvent.Description = row.Description;
+        }
+        if (row.Action && !existingEvent.Action) {
+          existingEvent.Action = row.Action;
+          existingEvent["Action Link"] = row["Action Link"];
+        }
       }
     } else {
       // New unique event, add it to our map
+      // For Side events with no description, give them a placeholder
+      if (row.Type === "Side" && !row.Description) {
+        row.Description = row["Event Name"] || "Event details available at venue";
+      }
+      
       uniqueEvents.set(eventKey, row);
     }
   });
@@ -98,6 +136,23 @@ function parseCSV(csvText: string): Event[] {
     if (row["Details Link"]) additionalData.detailsLink = row["Details Link"];
     if (row.Sponsors) additionalData.sponsors = row.Sponsors;
     
+    // Fix location field for Side events that have location in wrong column
+    let location = row.Location || "TBD";
+    
+    // Fix case where location is actually a time (common error in Side events)
+    if (location.includes(":") || location.includes("AM") || location.includes("PM")) {
+      console.log("Fixing incorrect location field:", location);
+      location = "TBD";
+    }
+    
+    // Debug output
+    console.log("Processing event:", {
+      name: row["Event Name"],
+      times: `${startTime} - ${endTime}`,
+      location: location,
+      type: row.Type
+    });
+    
     // Map the MAU Vegas CSV columns to our Event schema
     return {
       id: index + 1,
@@ -106,7 +161,7 @@ function parseCSV(csvText: string): Event[] {
       date: row.Date || new Date().toISOString().split('T')[0],
       startTime: startTime,
       endTime: endTime,
-      location: row.Location || "TBD",
+      location: location,
       // Map "Main" and "Side" to our event type enum
       type: mapEventType(row.Type),
       imageUrl: "", // No images in the CSV
