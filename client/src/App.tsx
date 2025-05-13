@@ -33,7 +33,7 @@ function Router() {
   }, []);
 
   return (
-    <div className="max-w-md mx-auto bg-white shadow-lg min-h-screen flex flex-col overflow-hidden border border-gray-300">
+    <div className="max-w-md mx-auto bg-white shadow-lg h-screen flex flex-col overflow-hidden border border-gray-300 relative">
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div>
           <h1 className="text-xl font-semibold text-gray-800">MAU Vegas 2025</h1>
@@ -45,7 +45,7 @@ function Router() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden pb-16" style={{ minHeight: "calc(100vh - 160px)" }}>
+      <main className="flex-1 overflow-auto" style={{ height: "calc(100vh - 120px)" }}>
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -58,7 +58,9 @@ function Router() {
         )}
       </main>
 
-      <TabNavigator currentTab={tab} onChange={setTab} />
+      <div className="w-full fixed bottom-0 left-0 right-0" style={{ maxWidth: "448px", margin: "0 auto" }}>
+        <TabNavigator currentTab={tab} onChange={setTab} />
+      </div>
     </div>
   );
 }

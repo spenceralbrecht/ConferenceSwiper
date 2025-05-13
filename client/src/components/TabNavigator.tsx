@@ -7,7 +7,7 @@ interface TabNavigatorProps {
 
 export default function TabNavigator({ currentTab, onChange }: TabNavigatorProps) {
   return (
-    <nav className="flex border-t border-gray-200 bg-white sticky bottom-0 left-0 right-0 z-50 shadow-md">
+    <nav className="flex border-t border-gray-200 bg-white shadow-md">
       <button 
         className={`flex-1 py-3 flex flex-col items-center ${currentTab === "discover" ? "text-primary" : "text-gray-500"}`}
         onClick={() => onChange("discover")}
