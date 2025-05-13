@@ -68,8 +68,36 @@
 
 /* Make the swipe container have proper height */
 .swipe-container {
-  min-height: 500px;
+  min-height: 600px;
+  height: calc(100vh - 200px);
+  max-height: 700px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  background-color: #f8fafc;
+  overflow: hidden;
+}
+
+/* Add better action indicators for swiping */
+.swipe-indicator-left {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ef4444;
+  font-size: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.swipe-indicator-right {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #22c55e;
+  font-size: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }

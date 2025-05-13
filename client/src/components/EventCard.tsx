@@ -58,20 +58,41 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
 
   console.log("Rendering event card:", event.title);
   
+  // Get color based on event type
+  const getCardBorderColor = () => {
+    switch (event.type) {
+      case "main":
+        return "#3b82f6"; // blue
+      case "networking":
+        return "#8b5cf6"; // purple
+      default:
+        return "#d1d5db"; // gray
+    }
+  };
+  
   return (
     <div 
-      className="rounded-xl bg-white shadow-lg overflow-hidden h-full relative border border-gray-300"
+      className="rounded-xl bg-white shadow-lg overflow-hidden h-full relative"
       onClick={onViewDetails}
       style={{ 
         minHeight: "500px", 
         background: "#ffffff",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" 
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        border: `2px solid ${getCardBorderColor()}`,
       }}
     >
       <div 
-        className="h-40 bg-cover bg-center"
-        style={{ backgroundImage: `url('${imageUrl}')` }}
-      ></div>
+        className="h-40 bg-cover bg-center border-b border-gray-200"
+        style={{ 
+          backgroundImage: `url('${imageUrl}')`,
+          backgroundColor: '#f0f4f8' // Fallback color if image doesn't load
+        }}
+      >
+        {/* Visual indicator that image is loading */}
+        <div className="h-full w-full flex items-center justify-center text-xs text-gray-500 bg-opacity-70">
+          {event.type === 'main' ? 'Official Event' : 'Side Event'}
+        </div>
+      </div>
       
       <div className="p-4">
         <div className="flex justify-between items-start">

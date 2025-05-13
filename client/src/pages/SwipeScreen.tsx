@@ -147,20 +147,25 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
       />
 
       <div className="swipe-container relative flex-1 mx-4 mb-4 rounded-xl overflow-hidden border border-gray-200" ref={constraintsRef}>
-        {/* Debug Banner - will remove once fixed */}
+        {/* Debug Banner */}
         <div className="absolute top-0 left-0 right-0 bg-blue-100 text-blue-800 text-xs p-1 text-center z-50">
           {remainingEvents.length} events available to swipe
         </div>
         
+        {/* Swipe indicators */}
+        <div className="swipe-indicator-left">👎 Not Interested</div>
+        <div className="swipe-indicator-right">👍 Interested</div>
+        
         {remainingEvents.length > 0 && currentEvent ? (
           <motion.div
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 w-full h-full px-2 py-4"
             drag="x"
             dragConstraints={constraintsRef}
             onDragEnd={handleDragEnd}
             animate={controls}
             initial={{ opacity: 1 }}
             style={{ zIndex: 10 }}
+            whileDrag={{ scale: 1.02 }}
           >
             <EventCard 
               event={currentEvent} 
