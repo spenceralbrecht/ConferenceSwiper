@@ -65,16 +65,11 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
     const threshold = 100;
     const xOffset = info.offset.x;
     
-    // Update the rotation based on drag position for more natural card movement
-    const rotate = xOffset * 0.2; // Rotate more the further you drag
-    
     if (xOffset > threshold) {
       // Swiped right - Interested
       console.log("Swiped right (interested):", currentEvent.id);
       await controls.start({ 
         x: "120%", 
-        y: "-10%",
-        rotate: Math.max(15, rotate), 
         opacity: 0,
         transition: { duration: 0.3 }
       });
@@ -85,8 +80,6 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
       console.log("Swiped left (not interested):", currentEvent.id);
       await controls.start({ 
         x: "-120%", 
-        y: "-10%",
-        rotate: Math.min(-15, rotate), 
         opacity: 0,
         transition: { duration: 0.3 }
       });
@@ -97,7 +90,6 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
       controls.start({ 
         x: 0, 
         y: 0,
-        rotate: 0,
         transition: { 
           type: "spring", 
           stiffness: 500, 
@@ -111,13 +103,15 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
     // Reset animation controls to prepare for next card
     controls.start({ 
       x: 0, 
-      rotate: 0, 
+      y: 0,
       opacity: 1,
       scale: 1,
       transition: { 
         type: "spring", 
-        stiffness: 300,
-        damping: 20 
+        stiffness: 400,
+        damping: 30,
+        mass: 1.2,  // More mass for a smoother, less bouncy feel
+        velocity: 0 // Reset velocity
       }
     });
     
@@ -125,14 +119,14 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
     if (currentIndex < remainingEvents.length - 1) {
       setTimeout(() => {
         setCurrentIndex(currentIndex + 1);
-      }, 300);
+      }, 250); // Slightly faster transition for a more responsive feel
     }
   };
   
   const handleSwipeRight = async () => {
     if (!currentEvent) return;
     console.log("Button: Liked event", currentEvent.id);
-    await controls.start({ x: "120%", rotate: 30, opacity: 0 });
+    await controls.start({ x: "120%", opacity: 0 });
     addInterested(currentEvent);
     nextCard();
   };
@@ -140,7 +134,7 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
   const handleSwipeLeft = async () => {
     if (!currentEvent) return;
     console.log("Button: Disliked event", currentEvent.id);
-    await controls.start({ x: "-120%", rotate: -30, opacity: 0 });
+    await controls.start({ x: "-120%", opacity: 0 });
     addNotInterested(currentEvent);
     nextCard();
   };
@@ -177,7 +171,7 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         onFilterChange={setActiveFilters} 
       />
 
-      <div className="swipe-container relative flex-1 mx-4 mb-4 rounded-xl overflow-hidden border border-gray-200" ref={constraintsRef}>
+      <div className="swipe-container relative flex-1 mx-4 mb-1 rounded-xl overflow-hidden border border-gray-200" ref={constraintsRef}>
         {/* Debug Banner */}
         <div className="absolute top-0 left-0 right-0 bg-blue-100 text-blue-800 text-xs p-1 text-center z-50">
           {remainingEvents.length} events available to swipe
@@ -192,11 +186,11 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
             {/* Next card in stack (shown behind current card) */}
             {currentIndex < remainingEvents.length - 1 && (
               <div
-                className="absolute inset-0 w-full h-full px-2 py-4"
+                className="absolute inset-0 w-full h-full px-2 py-2"
                 style={{ 
                   zIndex: 5, 
-                  transform: 'scale(0.95) translateY(10px)',
-                  opacity: 0.6
+                  transform: 'scale(0.98) translateY(5px)',
+                  opacity: 0.7
                 }}
               >
                 <EventCard 
@@ -208,16 +202,16 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
             
             {/* Current card (top of stack) */}
             <motion.div
-              className="absolute inset-0 w-full h-full px-2 py-4"
+              className="absolute inset-0 w-full h-full px-2 py-2"
               drag="x"
               dragConstraints={constraintsRef}
               onDragEnd={handleDragEnd}
               animate={controls}
-              initial={{ opacity: 1, scale: 1, rotate: 0 }}
+              initial={{ opacity: 1, scale: 1 }}
               style={{ zIndex: 10 }}
               whileDrag={{ 
                 scale: 1.02,
-                boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                boxShadow: "0 8px 15px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -5px rgba(0, 0, 0, 0.04)"
               }}
             >
               <EventCard 
@@ -238,20 +232,20 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
         )}
       </div>
 
-      <div className="flex justify-center space-x-6 pb-6">
+      <div className="flex justify-center space-x-6 pb-3 pt-1">
         <button 
-          className="w-14 h-14 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
+          className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
           onClick={handleSwipeLeft}
           disabled={!currentEvent}
         >
-          <X className="h-8 w-8 text-red-500" />
+          <X className="h-7 w-7 text-red-500" />
         </button>
         <button 
-          className="w-14 h-14 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
+          className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-md border border-gray-200"
           onClick={handleSwipeRight}
           disabled={!currentEvent}
         >
-          <Check className="h-8 w-8 text-green-500" />
+          <Check className="h-7 w-7 text-green-500" />
         </button>
       </div>
     </div>

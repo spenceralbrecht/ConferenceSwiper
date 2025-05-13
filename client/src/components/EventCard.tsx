@@ -73,7 +73,7 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
     <div 
       className="rounded-xl bg-white shadow-lg overflow-hidden h-full relative"
       style={{ 
-        minHeight: "500px", 
+        minHeight: "470px", 
         background: "#ffffff",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
         border: `2px solid ${getCardBorderColor()}`,
