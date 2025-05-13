@@ -1,6 +1,6 @@
 import { Event } from "@shared/schema";
 import { motion } from "framer-motion";
-import { MapPin } from "lucide-react";
+import { MapPin, Clock, Calendar } from "lucide-react";
 
 interface EventCardProps {
   event: Event;
@@ -30,7 +30,7 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
   // Format date display
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
   // Format time display (HH:MM to h:MM AM/PM)
@@ -44,6 +44,17 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
 
   // Define image URL with a fallback based on event type
   const imageUrl = event.imageUrl || getDefaultImageForType(event.type);
+  
+  // Determine if this is a MAU Vegas event (for display customization)
+  const isMauEvent = event.date.startsWith('2025-05');
+  
+  // For MAU events, map 'main' and 'networking' (side) to more descriptive labels
+  const getEventTypeLabel = () => {
+    if (isMauEvent) {
+      return event.type === 'main' ? 'Official Event' : 'Side Event';
+    }
+    return capitalizeFirstLetter(event.type);
+  };
 
   return (
     <div 
@@ -51,42 +62,50 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
       onClick={onViewDetails}
     >
       <div 
-        className="h-48 bg-cover bg-center"
+        className="h-40 bg-cover bg-center"
         style={{ backgroundImage: `url('${imageUrl}')` }}
       ></div>
       
       <div className="p-4">
         <div className="flex justify-between items-start">
-          <div>
+          <div className="flex-1">
             <span className={`inline-block ${getTypeBadgeStyle()} text-xs px-2 py-1 rounded-full font-medium`}>
-              {capitalizeFirstLetter(event.type)}
+              {getEventTypeLabel()}
             </span>
             <h2 className="mt-2 text-lg font-semibold">{event.title}</h2>
           </div>
-          <div className="text-right text-sm text-gray-600">
-            <div>{formatDate(event.date)}</div>
-            <div>{formatTime(event.startTime)} - {formatTime(event.endTime)}</div>
-          </div>
         </div>
-        <div className="mt-2 text-gray-600 text-sm line-clamp-2">
+        
+        <div className="mt-2 flex items-center text-sm text-gray-500">
+          <Calendar className="h-4 w-4 mr-1 flex-shrink-0" />
+          <span>{formatDate(event.date)}</span>
+        </div>
+        
+        <div className="mt-1 flex items-center text-sm text-gray-500">
+          <Clock className="h-4 w-4 mr-1 flex-shrink-0" />
+          <span>{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
+        </div>
+        
+        <div className="mt-1 flex items-start text-sm text-gray-500">
+          <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
+          <span className="line-clamp-1">{event.location}</span>
+        </div>
+        
+        <div className="mt-3 text-gray-600 text-sm line-clamp-2">
           {event.description}
-        </div>
-        <div className="mt-3 flex items-center text-sm text-gray-500">
-          <MapPin className="h-4 w-4 mr-1" />
-          <span>{event.location}</span>
         </div>
       </div>
       
       {/* Action Overlays for swipe gestures */}
       <div className="absolute top-0 right-0 w-full h-full flex items-center justify-center font-bold opacity-0 action-interested">
-        <div className="text-center">
+        <div className="text-center bg-green-100 bg-opacity-80 p-4 rounded-full">
           <div className="text-4xl">👍</div>
           <div className="text-xl font-semibold mt-2">Interested</div>
         </div>
       </div>
       
       <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center font-bold opacity-0 action-not-interested">
-        <div className="text-center">
+        <div className="text-center bg-red-100 bg-opacity-80 p-4 rounded-full">
           <div className="text-4xl">👎</div>
           <div className="text-xl font-semibold mt-2">Skip</div>
         </div>
@@ -102,13 +121,13 @@ function capitalizeFirstLetter(string: string): string {
 function getDefaultImageForType(type: string): string {
   switch (type) {
     case "main":
-      return "https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
+      return "https://images.unsplash.com/photo-1591115765373-5207764f72e4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
     case "workshop":
       return "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
     case "panel":
       return "https://images.unsplash.com/photo-1560439514-4e9645039924?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
     case "networking":
-      return "https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
+      return "https://images.unsplash.com/photo-1577202214328-c04b77cefb5d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
     case "breakout":
       return "https://images.unsplash.com/photo-1528605105345-5344ea20e269?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
     default:

@@ -32,14 +32,21 @@ function parseCSV(csvText: string): Event[] {
   
   // Map CSV data to Event objects
   const events: Event[] = parseResult.data.map((row: any, index: number) => {
-    // Parse time field which is in format "HH:MM–HH:MM"
+    // Parse time field which is in format "HH:MM–HH:MM" (using special dash character)
     let startTime = "00:00";
     let endTime = "00:00";
     
-    if (row.Time && row.Time.includes("–")) {
-      const timeParts = row.Time.split("–");
-      startTime = timeParts[0].trim();
-      endTime = timeParts[1].trim();
+    if (row.Time) {
+      // Handle both standard hyphen and em-dash
+      if (row.Time.includes("–")) {
+        const timeParts = row.Time.split("–");
+        startTime = timeParts[0].trim();
+        endTime = timeParts[1].trim();
+      } else if (row.Time.includes("-")) {
+        const timeParts = row.Time.split("-");
+        startTime = timeParts[0].trim();
+        endTime = timeParts[1].trim();
+      }
     }
     
     // Map the MAU Vegas CSV columns to our Event schema
@@ -70,7 +77,8 @@ function mapEventType(type: string): "main" | "workshop" | "panel" | "networking
     case "main":
       return "main";
     case "side":
-      // We'll categorize "Side" events as "networking" for better visual distinction
+      // For MAU Vegas, we'll map "Side" events to "networking" for visual distinction
+      // This will make them appear with a purple background in our UI
       return "networking";
     default:
       return "other";

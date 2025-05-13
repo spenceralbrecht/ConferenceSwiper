@@ -35,7 +35,10 @@ function Router() {
   return (
     <div className="max-w-md mx-auto bg-white shadow-lg min-h-screen flex flex-col">
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
-        <h1 className="text-xl font-semibold text-gray-800">Conference Scheduler</h1>
+        <div>
+          <h1 className="text-xl font-semibold text-gray-800">MAU Vegas 2025</h1>
+          <p className="text-xs text-gray-500">Conference Event Scheduler</p>
+        </div>
       </header>
 
       <main className="flex-1 overflow-hidden">

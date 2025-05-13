@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import EventDetailModal from "@/components/EventDetailModal";
 import TimeConflictBadge from "@/components/TimeConflictBadge";
 import { checkTimeConflict } from "@/lib/utils";
-import { X, Clock, MapPin } from "lucide-react";
+import { X, Clock, MapPin, Calendar } from "lucide-react";
 
 interface ScheduleScreenProps {
   events: Event[];
@@ -26,7 +26,8 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
   );
   
   // Extract unique dates from the scheduled events
-  const uniqueDates = [...new Set(scheduledEvents.map(event => event.date))].sort();
+  const uniqueDatesSet = new Set(scheduledEvents.map(event => event.date));
+  const uniqueDates = Array.from(uniqueDatesSet).sort();
   
   useEffect(() => {
     if (uniqueDates.length > 0 && !selectedDate) {
@@ -39,8 +40,16 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
     (event) => event.date === selectedDate
   );
   
+  // Sort events by start time
+  const sortedEvents = [...eventsForSelectedDate].sort((a, b) => {
+    // Convert time strings to minutes since midnight for comparison
+    const aMinutes = timeStringToMinutes(a.startTime);
+    const bMinutes = timeStringToMinutes(b.startTime);
+    return aMinutes - bMinutes;
+  });
+  
   // Check for time conflicts
-  const eventsWithConflicts = eventsForSelectedDate.map(event => {
+  const eventsWithConflicts = sortedEvents.map(event => {
     const conflicts = eventsForSelectedDate.filter(
       otherEvent => 
         event.id !== otherEvent.id && 
@@ -66,6 +75,13 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
   const openEventDetails = (event: Event) => {
     setSelectedEvent(event);
     setShowModal(true);
+  };
+  
+  // Format date for display in header
+  const formatDateHeader = (dateStr: string | null) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", { weekday: 'long', month: "long", day: "numeric", year: "numeric" });
   };
 
   return (
@@ -93,44 +109,62 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
             ))}
           </div>
           
+          {/* Selected Date Header */}
+          {selectedDate && (
+            <div className="flex items-center mb-3 text-sm font-medium text-gray-700">
+              <Calendar className="h-4 w-4 mr-2" />
+              {formatDateHeader(selectedDate)}
+            </div>
+          )}
+          
           {/* Schedule List */}
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-auto" style={{ maxHeight: 'calc(100vh - 240px)' }}>
             {eventsWithConflicts.length > 0 ? (
-              eventsWithConflicts.map((event) => (
-                <div 
-                  key={event.id} 
-                  className={`bg-white rounded-lg shadow p-3 border-l-4 ${event.hasConflict ? "border-red-500" : "border-primary"} ${event.hasConflict ? "animate-pulse" : ""}`}
-                  onClick={() => openEventDetails(event)}
-                >
-                  <div className="flex justify-between">
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className={`inline-block ${getTypeBadgeColor(event.type)} text-xs px-2 py-0.5 rounded-full`}>
-                          {capitalizeFirstLetter(event.type)}
-                        </span>
-                        {event.hasConflict && <TimeConflictBadge />}
+              eventsWithConflicts.map((event) => {
+                // Determine if this is a MAU Vegas event
+                const isMauEvent = event.date.startsWith('2025-05');
+                
+                // Get the appropriate event type label
+                const eventTypeLabel = isMauEvent 
+                  ? (event.type === 'main' ? 'Official Event' : 'Side Event')
+                  : capitalizeFirstLetter(event.type);
+                
+                return (
+                  <div 
+                    key={event.id} 
+                    className={`bg-white rounded-lg shadow p-3 border-l-4 ${event.hasConflict ? "border-red-500" : "border-primary"} ${event.hasConflict ? "animate-pulse" : ""}`}
+                    onClick={() => openEventDetails(event)}
+                  >
+                    <div className="flex justify-between">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`inline-block ${getTypeBadgeColor(event.type)} text-xs px-2 py-0.5 rounded-full`}>
+                            {eventTypeLabel}
+                          </span>
+                          {event.hasConflict && <TimeConflictBadge />}
+                        </div>
+                        <h3 className="text-base font-medium mt-1">{event.title}</h3>
                       </div>
-                      <h3 className="text-base font-medium mt-1">{event.title}</h3>
+                      <button 
+                        className="text-gray-400 hover:text-gray-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveEvent(event.id);
+                        }}
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
                     </div>
-                    <button 
-                      className="text-gray-400 hover:text-gray-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveEvent(event.id);
-                      }}
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
+                    <div className="mt-1 flex items-center text-sm text-gray-500">
+                      <Clock className="h-4 w-4 mr-1 flex-shrink-0" />
+                      <span>{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
+                      <span className="mx-2">•</span>
+                      <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+                      <span className="truncate">{event.location}</span>
+                    </div>
                   </div>
-                  <div className="mt-1 flex items-center text-sm text-gray-500">
-                    <Clock className="h-4 w-4 mr-1" />
-                    <span>{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
-                    <span className="mx-2">•</span>
-                    <MapPin className="h-4 w-4 mr-1" />
-                    <span>{event.location}</span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="text-center py-8 text-gray-500">
                 No events scheduled for this date.
@@ -162,6 +196,12 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
       )}
     </div>
   );
+}
+
+// Convert time string (HH:MM) to minutes since midnight for sorting
+function timeStringToMinutes(timeStr: string): number {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours * 60 + minutes;
 }
 
 function getTypeBadgeColor(type: string): string {
