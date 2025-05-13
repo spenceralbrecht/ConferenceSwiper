@@ -9,20 +9,21 @@ interface EventCardProps {
 
 export default function EventCard({ event, drag = false }: EventCardProps) {
   // Convert event type to display-friendly format and determine badge color
+  // Using Airbnb-inspired color palette
   const getTypeBadgeStyle = () => {
     switch (event.type) {
       case "main":
-        return "bg-blue-100 text-blue-800";
+        return "bg-rose-100 text-rose-800";
       case "workshop":
-        return "bg-green-100 text-green-800";
+        return "bg-teal-100 text-teal-800";
       case "panel":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-amber-100 text-amber-800";
       case "networking":
-        return "bg-purple-100 text-purple-800";
+        return "bg-cyan-100 text-cyan-800";
       case "breakout":
-        return "bg-orange-100 text-orange-800";
+        return "bg-fuchsia-100 text-fuchsia-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-slate-100 text-slate-800";
     }
   };
 
@@ -57,15 +58,15 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
 
   console.log("Rendering event card:", event.title);
   
-  // Get color based on event type
+  // Get color based on event type (using Airbnb-inspired colors)
   const getCardBorderColor = () => {
     switch (event.type) {
       case "main":
-        return "#3b82f6"; // blue
+        return "#FF5A5F"; // Airbnb red
       case "networking":
-        return "#8b5cf6"; // purple
+        return "#00A699"; // Airbnb teal
       default:
-        return "#d1d5db"; // gray
+        return "#484848"; // Airbnb dark gray
     }
   };
   
@@ -75,96 +76,101 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
       style={{ 
         minHeight: "420px", 
         background: "#ffffff",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        border: `2px solid ${getCardBorderColor()}`,
+        boxShadow: "0 6px 16px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.05)",
+        border: `1px solid ${getCardBorderColor()}`,
       }}
     >
       {/* Event type header banner instead of image */}
       <div 
-        className="py-3 px-4 border-b border-gray-200 font-semibold"
+        className="py-3 px-4 border-b border-gray-200"
         style={{ 
-          backgroundColor: event.type === 'main' ? '#3b82f6' : '#8b5cf6',
+          backgroundColor: event.type === 'main' ? '#FF5A5F' : '#00A699',
+          backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.1), rgba(255,255,255,0))',
           color: 'white'
         }}
       >
         <div className="flex justify-between items-center">
-          <div>{event.type === 'main' ? 'Official Event' : 'Side Event'}</div>
-          <div className="text-xs font-normal py-1 px-2 bg-white bg-opacity-20 rounded-full">
+          <div className="text-sm font-bold py-1 px-3 bg-white bg-opacity-20 rounded-full shadow-sm">
             {formatTime(event.startTime)} - {formatTime(event.endTime)}
           </div>
         </div>
       </div>
       
-      <div className="p-3">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <span className={`inline-block ${getTypeBadgeStyle()} text-xs px-2 py-1 rounded-full font-medium`}>
-              {getEventTypeLabel()}
-            </span>
-            <h2 className="mt-1 text-lg font-semibold">{event.title}</h2>
+      <div className="p-4">
+        {/* Category badge at top */}
+        <div className="flex justify-between items-start mb-2">
+          <span className={`inline-block ${getTypeBadgeStyle()} text-xs px-2 py-1 rounded-md font-medium shadow-sm`}>
+            {getEventTypeLabel()}
+          </span>
+        </div>
+        
+        {/* Event title with large clear font */}
+        <h2 className="text-xl font-bold text-gray-900 mb-3 leading-tight">{event.title}</h2>
+        
+        {/* Info section with improved readability */}
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center">
+            <Calendar className="h-5 w-5 mr-3 text-rose-500 flex-shrink-0" />
+            <span className="text-base font-medium text-gray-700">{formatDate(event.date)}</span>
+          </div>
+          
+          <div className="flex items-center">
+            <Clock className="h-5 w-5 mr-3 text-rose-500 flex-shrink-0" />
+            <span className="text-base font-medium text-gray-700">{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
+          </div>
+          
+          <div className="flex items-start">
+            <MapPin className="h-5 w-5 mr-3 mt-0.5 text-rose-500 flex-shrink-0" />
+            <span className="text-base font-medium text-gray-700 line-clamp-1">{event.location}</span>
           </div>
         </div>
         
-        <div className="mt-1 flex items-center text-sm text-gray-500">
-          <Calendar className="h-4 w-4 mr-1 flex-shrink-0" />
-          <span>{formatDate(event.date)}</span>
-        </div>
-        
-        <div className="mt-1 flex items-center text-sm text-gray-500">
-          <Clock className="h-4 w-4 mr-1 flex-shrink-0" />
-          <span>{formatTime(event.startTime)} - {formatTime(event.endTime)}</span>
-        </div>
-        
-        <div className="mt-1 flex items-start text-sm text-gray-500">
-          <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
-          <span className="line-clamp-1">{event.location}</span>
-        </div>
-        
-        {/* Show sponsor information if available */}
-        {event.additionalData && (() => {
-          try {
-            const additionalData = JSON.parse(event.additionalData);
-            if (additionalData.sponsors) {
-              return (
-                <div className="mt-2 text-xs text-gray-400 italic">
-                  Sponsored by {additionalData.sponsors}
-                </div>
-              );
-            }
-            return null;
-          } catch (e) {
-            return null;
-          }
-        })()}
-        
-        <div className="mt-1 text-gray-600 text-sm line-clamp-2">
+        {/* Description with better readability */}
+        <div className="text-gray-700 text-sm leading-relaxed line-clamp-2 mb-4">
           {event.description}
         </div>
         
-        {/* Add action button indicator if available */}
-        {event.additionalData && (() => {
-          try {
-            const additionalData = JSON.parse(event.additionalData);
-            if (additionalData.action && additionalData.actionLink) {
-              return (
-                <div className="mt-2">
+        <div className="flex flex-wrap gap-2 mt-auto">
+          {/* Show sponsor information if available */}
+          {event.additionalData && (() => {
+            try {
+              const additionalData = JSON.parse(event.additionalData);
+              if (additionalData.sponsors) {
+                return (
+                  <div className="text-xs text-gray-500 font-medium bg-gray-100 px-3 py-1 rounded-full">
+                    Sponsored by {additionalData.sponsors}
+                  </div>
+                );
+              }
+              return null;
+            } catch (e) {
+              return null;
+            }
+          })()}
+          
+          {/* Add action button indicator if available */}
+          {event.additionalData && (() => {
+            try {
+              const additionalData = JSON.parse(event.additionalData);
+              if (additionalData.action && additionalData.actionLink) {
+                return (
                   <a 
                     href={additionalData.actionLink} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-3 rounded-md text-xs transition-colors"
+                    className="inline-block bg-rose-500 hover:bg-rose-600 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors shadow-sm"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {additionalData.action}
                   </a>
-                </div>
-              );
+                );
+              }
+              return null;
+            } catch (e) {
+              return null;
             }
-            return null;
-          } catch (e) {
-            return null;
-          }
-        })()}
+          })()}
+        </div>
       </div>
       
       {/* Action Overlays for swipe gestures */}
