@@ -4,11 +4,10 @@ import { MapPin, Clock, Calendar } from "lucide-react";
 
 interface EventCardProps {
   event: Event;
-  onViewDetails: () => void;
   drag?: boolean;
 }
 
-export default function EventCard({ event, onViewDetails = () => {}, drag = false }: EventCardProps) {
+export default function EventCard({ event, drag = false }: EventCardProps) {
   // Convert event type to display-friendly format and determine badge color
   const getTypeBadgeStyle = () => {
     switch (event.type) {
@@ -42,8 +41,8 @@ export default function EventCard({ event, onViewDetails = () => {}, drag = fals
     return `${hour12}:${minutes} ${ampm}`;
   };
 
-  // Define image URL with a fallback based on event type
-  const imageUrl = event.imageUrl || getDefaultImageForType(event.type);
+  // Since we don't have images, don't define an image URL
+  // const imageUrl = event.imageUrl || getDefaultImageForType(event.type);
   
   // Determine if this is a MAU Vegas event (for display customization)
   const isMauEvent = event.date.startsWith('2025-05');
@@ -73,7 +72,6 @@ export default function EventCard({ event, onViewDetails = () => {}, drag = fals
   return (
     <div 
       className="rounded-xl bg-white shadow-lg overflow-hidden h-full relative"
-      onClick={onViewDetails}
       style={{ 
         minHeight: "500px", 
         background: "#ffffff",
@@ -191,19 +189,7 @@ function capitalizeFirstLetter(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function getDefaultImageForType(type: string): string {
-  switch (type) {
-    case "main":
-      return "https://images.unsplash.com/photo-1591115765373-5207764f72e4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
-    case "workshop":
-      return "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
-    case "panel":
-      return "https://images.unsplash.com/photo-1560439514-4e9645039924?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
-    case "networking":
-      return "https://images.unsplash.com/photo-1577202214328-c04b77cefb5d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
-    case "breakout":
-      return "https://images.unsplash.com/photo-1528605105345-5344ea20e269?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
-    default:
-      return "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=350";
-  }
-}
+// No longer need default images since we don't show images
+// function getDefaultImageForType(type: string): string {
+//   // Removed functionality
+// }
