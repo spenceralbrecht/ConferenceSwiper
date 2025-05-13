@@ -33,15 +33,19 @@ function Router() {
   }, []);
 
   return (
-    <div className="max-w-md mx-auto bg-white shadow-lg min-h-screen flex flex-col">
+    <div className="max-w-md mx-auto bg-white shadow-lg min-h-screen flex flex-col overflow-hidden border border-gray-300">
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div>
           <h1 className="text-xl font-semibold text-gray-800">MAU Vegas 2025</h1>
           <p className="text-xs text-gray-500">Conference Event Scheduler</p>
         </div>
+        {/* Add event counter */}
+        <div className="text-xs text-primary font-medium bg-blue-50 px-2 py-1 rounded-full">
+          {events.length} Events
+        </div>
       </header>
 
-      <main className="flex-1 overflow-hidden">
+      <main className="flex-1 overflow-hidden" style={{ minHeight: "calc(100vh - 160px)" }}>
         {loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

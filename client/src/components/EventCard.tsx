@@ -56,11 +56,17 @@ export default function EventCard({ event, onViewDetails, drag = false }: EventC
     return capitalizeFirstLetter(event.type);
   };
 
+  console.log("Rendering event card:", event.title);
+  
   return (
     <div 
-      className="rounded-xl bg-white shadow-lg overflow-hidden h-full relative"
+      className="rounded-xl bg-white shadow-lg overflow-hidden h-full relative border border-gray-300"
       onClick={onViewDetails}
-      style={{ minHeight: "500px" }}
+      style={{ 
+        minHeight: "500px", 
+        background: "#ffffff",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" 
+      }}
     >
       <div 
         className="h-40 bg-cover bg-center"
