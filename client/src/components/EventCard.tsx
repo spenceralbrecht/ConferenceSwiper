@@ -152,56 +152,46 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
           <div className="flex justify-center w-full my-2">
             {event.additionalData && (() => {
               try {
-                // Log the raw additionalData to help with debugging
-                console.log(`Event ${event.id} additionalData:`, event.additionalData);
-                
+                // Parse the additional data
                 const additionalData = JSON.parse(event.additionalData || '{}');
                 
-                // First priority: Action + ActionLink
+                // Create direct button for RSVP
                 if (additionalData.action && additionalData.actionLink) {
                   const url = additionalData.actionLink.startsWith('http') 
                     ? additionalData.actionLink 
                     : `https://mauvegas.com/${additionalData.actionLink}`;
                   
-                  console.log(`Event ${event.id} RSVP button URL:`, url);
-                  
                   return (
-                    <a 
+                    <button 
                       className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => {
-                        // Log click event to help with debugging
-                        console.log(`Clicked RSVP button for event ${event.id}:`, url);
+                      onClick={() => {
+                        // Directly open the URL in a new tab
+                        window.open(url, '_blank');
+                        console.log(`Opening URL: ${url}`);
                       }}
                     >
                       {additionalData.action || "RSVP"}
-                    </a>
+                    </button>
                   );
                 }
                 
-                // Second priority: DetailsLink
+                // Create direct button for Learn More
                 if (additionalData.detailsLink) {
                   const url = additionalData.detailsLink.startsWith('http') 
                     ? additionalData.detailsLink 
                     : `https://mauvegas.com/${additionalData.detailsLink}`;
                   
-                  console.log(`Event ${event.id} Learn More button URL:`, url);
-                  
                   return (
-                    <a 
-                      href={url}
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
-                      onClick={(e) => {
-                        // Log click event to help with debugging
-                        console.log(`Clicked Learn More button for event ${event.id}:`, url);
+                    <button
+                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md" 
+                      onClick={() => {
+                        // Directly open the URL in a new tab
+                        window.open(url, '_blank');
+                        console.log(`Opening URL: ${url}`);
                       }}
                     >
                       Learn More
-                    </a>
+                    </button>
                   );
                 }
                 

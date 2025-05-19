@@ -163,9 +163,7 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                 <div className="w-full flex justify-center mb-2">
                                   {event.additionalData && (() => {
                                     try {
-                                      // Log the additionalData for debugging
-                                      console.log(`Schedule view: Event ${event.id} additionalData:`, event.additionalData);
-                                      
+                                      // Parse the additionalData
                                       const data = JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}');
                                       
                                       // First priority: Action + ActionLink
@@ -174,18 +172,16 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                           ? data.actionLink 
                                           : `https://mauvegas.com/${data.actionLink}`;
                                         
-                                        console.log(`Schedule view: Event ${event.id} RSVP URL:`, url);
-                                        
                                         return (
-                                          <a 
-                                            href={url}
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
+                                          <button 
                                             className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
-                                            onClick={() => console.log(`Schedule view: Clicked RSVP for Event ${event.id}:`, url)}
+                                            onClick={() => {
+                                              window.open(url, '_blank');
+                                              console.log(`Schedule view: Opening URL for Event ${event.id}:`, url);
+                                            }}
                                           >
                                             {data.action}
-                                          </a>
+                                          </button>
                                         );
                                       } 
                                       
@@ -195,18 +191,16 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                           ? data.detailsLink 
                                           : `https://mauvegas.com/${data.detailsLink}`;
                                         
-                                        console.log(`Schedule view: Event ${event.id} Learn More URL:`, url);
-                                        
                                         return (
-                                          <a 
-                                            href={url}
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
+                                          <button 
                                             className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
-                                            onClick={() => console.log(`Schedule view: Clicked Learn More for Event ${event.id}:`, url)}
+                                            onClick={() => {
+                                              window.open(url, '_blank');
+                                              console.log(`Schedule view: Opening URL for Event ${event.id}:`, url);
+                                            }}
                                           >
                                             Learn More
-                                          </a>
+                                          </button>
                                         );
                                       }
                                       return null;
