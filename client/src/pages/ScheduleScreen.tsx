@@ -173,15 +173,20 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                           : `https://mauvegas.com/${data.actionLink}`;
                                         
                                         return (
-                                          <button 
-                                            className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
-                                            onClick={() => {
-                                              window.open(url, '_blank');
-                                              console.log(`Schedule view: Opening URL for Event ${event.id}:`, url);
-                                            }}
-                                          >
-                                            {data.action}
-                                          </button>
+                                          <div className="rsvp-button-wrapper" onClick={(e) => e.stopPropagation()}>
+                                            <a 
+                                              className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md no-underline"
+                                              href={url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              style={{ textDecoration: 'none', color: 'white' }}
+                                              onClick={(e) => {
+                                                console.log(`SCHEDULE VIEW RSVP CLICKED for Event ${event.id}: ${url}`);
+                                              }}
+                                            >
+                                              {data.action}
+                                            </a>
+                                          </div>
                                         );
                                       } 
                                       
@@ -192,15 +197,20 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                           : `https://mauvegas.com/${data.detailsLink}`;
                                         
                                         return (
-                                          <button 
-                                            className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
-                                            onClick={() => {
-                                              window.open(url, '_blank');
-                                              console.log(`Schedule view: Opening URL for Event ${event.id}:`, url);
-                                            }}
-                                          >
-                                            Learn More
-                                          </button>
+                                          <div className="rsvp-button-wrapper" onClick={(e) => e.stopPropagation()}>
+                                            <a 
+                                              className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md no-underline"
+                                              href={url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              style={{ textDecoration: 'none', color: 'white' }}
+                                              onClick={(e) => {
+                                                console.log(`SCHEDULE VIEW LEARN MORE CLICKED for Event ${event.id}: ${url}`);
+                                              }}
+                                            >
+                                              Learn More
+                                            </a>
+                                          </div>
                                         );
                                       }
                                       return null;

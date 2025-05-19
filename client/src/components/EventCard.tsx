@@ -162,16 +162,20 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
                     : `https://mauvegas.com/${additionalData.actionLink}`;
                   
                   return (
-                    <button 
-                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
-                      onClick={() => {
-                        // Directly open the URL in a new tab
-                        window.open(url, '_blank');
-                        console.log(`Opening URL: ${url}`);
-                      }}
-                    >
-                      {additionalData.action || "RSVP"}
-                    </button>
+                    <div className="rsvp-button-wrapper" onClick={(e) => e.stopPropagation()}>
+                      <a 
+                        className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md no-underline"
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none', color: 'white' }}
+                        onClick={(e) => {
+                          console.log(`EVENT CARD RSVP CLICKED: ${url}`);
+                        }}
+                      >
+                        {additionalData.action || "RSVP"}
+                      </a>
+                    </div>
                   );
                 }
                 
@@ -182,16 +186,20 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
                     : `https://mauvegas.com/${additionalData.detailsLink}`;
                   
                   return (
-                    <button
-                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md" 
-                      onClick={() => {
-                        // Directly open the URL in a new tab
-                        window.open(url, '_blank');
-                        console.log(`Opening URL: ${url}`);
-                      }}
-                    >
-                      Learn More
-                    </button>
+                    <div className="rsvp-button-wrapper" onClick={(e) => e.stopPropagation()}>
+                      <a 
+                        className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md no-underline"
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none', color: 'white' }}
+                        onClick={(e) => {
+                          console.log(`EVENT CARD LEARN MORE CLICKED: ${url}`);
+                        }}
+                      >
+                        Learn More
+                      </a>
+                    </div>
                   );
                 }
                 
