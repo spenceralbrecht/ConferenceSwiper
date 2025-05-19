@@ -163,27 +163,47 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                 <div className="w-full flex justify-center mb-2">
                                   {event.additionalData && (() => {
                                     try {
+                                      // Log the additionalData for debugging
+                                      console.log(`Schedule view: Event ${event.id} additionalData:`, event.additionalData);
+                                      
                                       const data = JSON.parse(typeof event.additionalData === 'string' ? event.additionalData : '{}');
+                                      
+                                      // First priority: Action + ActionLink
                                       if (data.action && data.actionLink) {
-                                        const url = data.actionLink.startsWith('http') ? data.actionLink : `https://mauvegas.com/${data.actionLink}`;
+                                        const url = data.actionLink.startsWith('http') 
+                                          ? data.actionLink 
+                                          : `https://mauvegas.com/${data.actionLink}`;
+                                        
+                                        console.log(`Schedule view: Event ${event.id} RSVP URL:`, url);
+                                        
                                         return (
                                           <a 
                                             href={url}
                                             target="_blank" 
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
+                                            onClick={() => console.log(`Schedule view: Clicked RSVP for Event ${event.id}:`, url)}
                                           >
                                             {data.action}
                                           </a>
                                         );
-                                      } else if (data.detailsLink) {
-                                        const url = data.detailsLink.startsWith('http') ? data.detailsLink : `https://mauvegas.com/${data.detailsLink}`;
+                                      } 
+                                      
+                                      // Second priority: DetailsLink
+                                      if (data.detailsLink) {
+                                        const url = data.detailsLink.startsWith('http') 
+                                          ? data.detailsLink 
+                                          : `https://mauvegas.com/${data.detailsLink}`;
+                                        
+                                        console.log(`Schedule view: Event ${event.id} Learn More URL:`, url);
+                                        
                                         return (
                                           <a 
                                             href={url}
                                             target="_blank" 
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
+                                            onClick={() => console.log(`Schedule view: Clicked Learn More for Event ${event.id}:`, url)}
                                           >
                                             Learn More
                                           </a>
