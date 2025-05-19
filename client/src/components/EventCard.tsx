@@ -152,28 +152,53 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
           <div className="flex justify-center w-full my-2">
             {event.additionalData && (() => {
               try {
-                const additionalData = JSON.parse(event.additionalData);
+                // Log the raw additionalData to help with debugging
+                console.log(`Event ${event.id} additionalData:`, event.additionalData);
+                
+                const additionalData = JSON.parse(event.additionalData || '{}');
+                
+                // First priority: Action + ActionLink
                 if (additionalData.action && additionalData.actionLink) {
+                  const url = additionalData.actionLink.startsWith('http') 
+                    ? additionalData.actionLink 
+                    : `https://mauvegas.com/${additionalData.actionLink}`;
+                  
+                  console.log(`Event ${event.id} RSVP button URL:`, url);
+                  
                   return (
                     <a 
                       className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
-                      href={additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`}
+                      href={url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => {
+                        // Log click event to help with debugging
+                        console.log(`Clicked RSVP button for event ${event.id}:`, url);
+                      }}
                     >
                       {additionalData.action || "RSVP"}
                     </a>
                   );
                 }
                 
-                // Show a generic RSVP button if no action but we have detailsLink
-                if (!additionalData.action && additionalData.detailsLink) {
+                // Second priority: DetailsLink
+                if (additionalData.detailsLink) {
+                  const url = additionalData.detailsLink.startsWith('http') 
+                    ? additionalData.detailsLink 
+                    : `https://mauvegas.com/${additionalData.detailsLink}`;
+                  
+                  console.log(`Event ${event.id} Learn More button URL:`, url);
+                  
                   return (
                     <a 
-                      href={additionalData.detailsLink.startsWith('http') ? additionalData.detailsLink : `https://mauvegas.com/${additionalData.detailsLink}`} 
+                      href={url}
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
+                      onClick={(e) => {
+                        // Log click event to help with debugging
+                        console.log(`Clicked Learn More button for event ${event.id}:`, url);
+                      }}
                     >
                       Learn More
                     </a>
