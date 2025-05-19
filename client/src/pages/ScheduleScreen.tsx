@@ -173,19 +173,40 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                           : `https://mauvegas.com/${data.actionLink}`;
                                         
                                         return (
-                                          <div className="rsvp-button-wrapper" onClick={(e) => e.stopPropagation()}>
-                                            <a 
-                                              className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md no-underline"
-                                              href={url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              style={{ textDecoration: 'none', color: 'white' }}
-                                              onClick={(e) => {
-                                                console.log(`SCHEDULE VIEW RSVP CLICKED for Event ${event.id}: ${url}`);
-                                              }}
-                                            >
-                                              {data.action}
-                                            </a>
+                                          <div 
+                                            className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md cursor-pointer"
+                                            style={{ userSelect: 'none' }}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              // Use plain JavaScript to handle opening URL directly
+                                              console.log(`SCHEDULE VIEW: DIRECT LINK ATTEMPT for event ${event.id}: ${url}`);
+                                              // Try multiple browser approaches
+                                              try {
+                                                // Method 1: window.location direct
+                                                const win = window.open(url, '_blank');
+                                                if (win) {
+                                                  win.focus();
+                                                  console.log('Window opened success method 1');
+                                                } else {
+                                                  // Method 2: Create and click a link
+                                                  const link = document.createElement('a');
+                                                  link.href = url;
+                                                  link.setAttribute('target', '_blank');
+                                                  link.setAttribute('rel', 'noopener noreferrer');
+                                                  document.body.appendChild(link);
+                                                  link.click();
+                                                  document.body.removeChild(link);
+                                                  console.log('Window opened success method 2');
+                                                }
+                                              } catch (err) {
+                                                console.error('Failed to open link:', err);
+                                                // Last resort: change window location
+                                                alert(`Can't open in new tab. Redirecting to: ${url}`);
+                                                window.location.href = url;
+                                              }
+                                            }}
+                                          >
+                                            {data.action}
                                           </div>
                                         );
                                       } 
@@ -197,19 +218,40 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                           : `https://mauvegas.com/${data.detailsLink}`;
                                         
                                         return (
-                                          <div className="rsvp-button-wrapper" onClick={(e) => e.stopPropagation()}>
-                                            <a 
-                                              className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md no-underline"
-                                              href={url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              style={{ textDecoration: 'none', color: 'white' }}
-                                              onClick={(e) => {
-                                                console.log(`SCHEDULE VIEW LEARN MORE CLICKED for Event ${event.id}: ${url}`);
-                                              }}
-                                            >
-                                              Learn More
-                                            </a>
+                                          <div 
+                                            className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md cursor-pointer"
+                                            style={{ userSelect: 'none' }}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              // Use plain JavaScript to handle opening URL directly
+                                              console.log(`SCHEDULE VIEW: DIRECT LINK ATTEMPT for event ${event.id}: ${url}`);
+                                              // Try multiple browser approaches
+                                              try {
+                                                // Method 1: window.location direct
+                                                const win = window.open(url, '_blank');
+                                                if (win) {
+                                                  win.focus();
+                                                  console.log('Window opened success method 1');
+                                                } else {
+                                                  // Method 2: Create and click a link
+                                                  const link = document.createElement('a');
+                                                  link.href = url;
+                                                  link.setAttribute('target', '_blank');
+                                                  link.setAttribute('rel', 'noopener noreferrer');
+                                                  document.body.appendChild(link);
+                                                  link.click();
+                                                  document.body.removeChild(link);
+                                                  console.log('Window opened success method 2');
+                                                }
+                                              } catch (err) {
+                                                console.error('Failed to open link:', err);
+                                                // Last resort: change window location
+                                                alert(`Can't open in new tab. Redirecting to: ${url}`);
+                                                window.location.href = url;
+                                              }
+                                            }}
+                                          >
+                                            Learn More
                                           </div>
                                         );
                                       }

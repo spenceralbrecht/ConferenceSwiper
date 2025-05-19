@@ -162,19 +162,40 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
                     : `https://mauvegas.com/${additionalData.actionLink}`;
                   
                   return (
-                    <div className="rsvp-button-wrapper" onClick={(e) => e.stopPropagation()}>
-                      <a 
-                        className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md no-underline"
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ textDecoration: 'none', color: 'white' }}
-                        onClick={(e) => {
-                          console.log(`EVENT CARD RSVP CLICKED: ${url}`);
-                        }}
-                      >
-                        {additionalData.action || "RSVP"}
-                      </a>
+                    <div 
+                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md cursor-pointer"
+                      style={{ userSelect: 'none' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Use plain JavaScript to handle opening URL directly
+                        console.log(`DIRECT LINK ATTEMPT: ${url}`);
+                        // Try multiple browser approaches
+                        try {
+                          // Method 1: window.location direct
+                          const win = window.open(url, '_blank');
+                          if (win) {
+                            win.focus();
+                            console.log('Window opened success method 1');
+                          } else {
+                            // Method 2: Create and click a link
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('target', '_blank');
+                            link.setAttribute('rel', 'noopener noreferrer');
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            console.log('Window opened success method 2');
+                          }
+                        } catch (err) {
+                          console.error('Failed to open link:', err);
+                          // Last resort: change window location
+                          alert(`Can't open in new tab. Redirecting to: ${url}`);
+                          window.location.href = url;
+                        }
+                      }}
+                    >
+                      {additionalData.action || "RSVP"}
                     </div>
                   );
                 }
@@ -186,19 +207,40 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
                     : `https://mauvegas.com/${additionalData.detailsLink}`;
                   
                   return (
-                    <div className="rsvp-button-wrapper" onClick={(e) => e.stopPropagation()}>
-                      <a 
-                        className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md no-underline"
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ textDecoration: 'none', color: 'white' }}
-                        onClick={(e) => {
-                          console.log(`EVENT CARD LEARN MORE CLICKED: ${url}`);
-                        }}
-                      >
-                        Learn More
-                      </a>
+                    <div 
+                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md cursor-pointer"
+                      style={{ userSelect: 'none' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Use plain JavaScript to handle opening URL directly
+                        console.log(`DIRECT LINK ATTEMPT: ${url}`);
+                        // Try multiple browser approaches
+                        try {
+                          // Method 1: window.location direct
+                          const win = window.open(url, '_blank');
+                          if (win) {
+                            win.focus();
+                            console.log('Window opened success method 1');
+                          } else {
+                            // Method 2: Create and click a link
+                            const link = document.createElement('a');
+                            link.href = url;
+                            link.setAttribute('target', '_blank');
+                            link.setAttribute('rel', 'noopener noreferrer');
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            console.log('Window opened success method 2');
+                          }
+                        } catch (err) {
+                          console.error('Failed to open link:', err);
+                          // Last resort: change window location
+                          alert(`Can't open in new tab. Redirecting to: ${url}`);
+                          window.location.href = url;
+                        }
+                      }}
+                    >
+                      Learn More
                     </div>
                   );
                 }
