@@ -155,29 +155,14 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
                 const additionalData = JSON.parse(event.additionalData);
                 if (additionalData.action && additionalData.actionLink) {
                   return (
-                    <button 
+                    <a 
                       className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const url = additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`;
-                        console.log("Clicked RSVP link:", url);
-                        // Try multiple methods to ensure the link opens
-                        try {
-                          window.open(url, '_blank');
-                        } catch (err) {
-                          console.error("Failed to open window:", err);
-                          // Fallback to location change if window.open fails
-                          const newTab = document.createElement('a');
-                          newTab.href = url;
-                          newTab.target = '_blank';
-                          newTab.rel = 'noopener noreferrer';
-                          newTab.click();
-                        }
-                      }}
+                      href={additionalData.actionLink.startsWith('http') ? additionalData.actionLink : `https://mauvegas.com/${additionalData.actionLink}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      {additionalData.action}
-                    </button>
+                      {additionalData.action || "RSVP"}
+                    </a>
                   );
                 }
                 
@@ -189,14 +174,6 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const url = additionalData.detailsLink.startsWith('http') ? additionalData.detailsLink : `https://mauvegas.com/${additionalData.detailsLink}`;
-                        console.log("Clicked details link:", url);
-                        window.open(url, '_blank', 'noopener,noreferrer');
-                        return false;
-                      }}
                     >
                       Learn More
                     </a>
