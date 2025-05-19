@@ -173,8 +173,10 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
                                             onClick={(e) => {
+                                              e.preventDefault();
                                               console.log("Clicked RSVP link:", url);
-                                              window.open(url, '_blank');
+                                              window.open(url, '_blank', 'noopener,noreferrer');
+                                              return false;
                                             }}
                                           >
                                             {data.action}
@@ -189,8 +191,10 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center text-sm font-medium bg-rose-600 text-white py-2 px-5 rounded-md hover:bg-rose-700 shadow-md"
                                             onClick={(e) => {
+                                              e.preventDefault();
                                               console.log("Clicked details link:", url);
-                                              window.open(url, '_blank');
+                                              window.open(url, '_blank', 'noopener,noreferrer');
+                                              return false;
                                             }}
                                           >
                                             Learn More
