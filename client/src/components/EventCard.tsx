@@ -148,103 +148,20 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
             }
           })()}
           
-          {/* Add action button indicator if available */}
-          <div className="flex justify-center w-full my-2">
+          {/* No buttons in swipe cards - only show in schedule view */}
+          <div className="w-full my-2">
             {event.additionalData && (() => {
               try {
-                // Parse the additional data
+                // Just for debugging - log that we have links available
                 const additionalData = JSON.parse(event.additionalData || '{}');
-                
-                // Create direct button for RSVP
                 if (additionalData.action && additionalData.actionLink) {
-                  const url = additionalData.actionLink.startsWith('http') 
-                    ? additionalData.actionLink 
-                    : `https://mauvegas.com/${additionalData.actionLink}`;
-                  
-                  return (
-                    <div 
-                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md cursor-pointer"
-                      style={{ userSelect: 'none' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Use plain JavaScript to handle opening URL directly
-                        console.log(`DIRECT LINK ATTEMPT: ${url}`);
-                        // Try multiple browser approaches
-                        try {
-                          // Method 1: window.location direct
-                          const win = window.open(url, '_blank');
-                          if (win) {
-                            win.focus();
-                            console.log('Window opened success method 1');
-                          } else {
-                            // Method 2: Create and click a link
-                            const link = document.createElement('a');
-                            link.href = url;
-                            link.setAttribute('target', '_blank');
-                            link.setAttribute('rel', 'noopener noreferrer');
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            console.log('Window opened success method 2');
-                          }
-                        } catch (err) {
-                          console.error('Failed to open link:', err);
-                          // Last resort: change window location
-                          alert(`Can't open in new tab. Redirecting to: ${url}`);
-                          window.location.href = url;
-                        }
-                      }}
-                    >
-                      {additionalData.action || "RSVP"}
-                    </div>
-                  );
+                  console.log(`Link available (but not shown in card): ${additionalData.action}`);
                 }
-                
-                // Create direct button for Learn More
                 if (additionalData.detailsLink) {
-                  const url = additionalData.detailsLink.startsWith('http') 
-                    ? additionalData.detailsLink 
-                    : `https://mauvegas.com/${additionalData.detailsLink}`;
-                  
-                  return (
-                    <div 
-                      className="inline-block bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-5 rounded-md text-sm transition-colors shadow-md cursor-pointer"
-                      style={{ userSelect: 'none' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Use plain JavaScript to handle opening URL directly
-                        console.log(`DIRECT LINK ATTEMPT: ${url}`);
-                        // Try multiple browser approaches
-                        try {
-                          // Method 1: window.location direct
-                          const win = window.open(url, '_blank');
-                          if (win) {
-                            win.focus();
-                            console.log('Window opened success method 1');
-                          } else {
-                            // Method 2: Create and click a link
-                            const link = document.createElement('a');
-                            link.href = url;
-                            link.setAttribute('target', '_blank');
-                            link.setAttribute('rel', 'noopener noreferrer');
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            console.log('Window opened success method 2');
-                          }
-                        } catch (err) {
-                          console.error('Failed to open link:', err);
-                          // Last resort: change window location
-                          alert(`Can't open in new tab. Redirecting to: ${url}`);
-                          window.location.href = url;
-                        }
-                      }}
-                    >
-                      Learn More
-                    </div>
-                  );
+                  console.log(`Details available (but not shown in card)`);
                 }
                 
+                // Don't display any buttons in the swipe view
                 return null;
               } catch (e) {
                 console.error("Error parsing additionalData:", e);
