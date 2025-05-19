@@ -10,7 +10,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/events/csv", async (req, res) => {
     try {
       // Read from the updated MAU Vegas 2025 CSV file
-      const filePath = path.join(process.cwd(), 'static', 'mau_vegas_all_events_complete2.csv');
+      const filePath = path.join(process.cwd(), 'static', 'mau-final.csv');
       const csvData = await fs.readFile(filePath, 'utf8');
       
       res.header("Content-Type", "text/csv");
