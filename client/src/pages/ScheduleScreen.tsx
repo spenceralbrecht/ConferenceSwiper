@@ -73,20 +73,29 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
     removeInterested(eventId);
   };
   
-  // Format date for display in header - use exact date from CSV 
+  // Format date for display in header - ensure correct date display
   function formatDateHeader(dateStr: string) {
-    // Parse the date parts directly from the YYYY-MM-DD format
+    // Add debug info
+    console.log(`Formatting date: ${dateStr}`);
+    
+    // Use UTC date to avoid timezone issues
     const [year, month, day] = dateStr.split('-').map(Number);
     
-    // Create a date object using the parts
-    const date = new Date(year, month - 1, day); // month is 0-indexed in JS Date
+    // Create date with UTC to avoid any timezone adjustments
+    const date = new Date(Date.UTC(year, month - 1, day));
+    console.log(`Created date object: ${date.toISOString()}`);
     
-    return date.toLocaleDateString("en-US", { 
-      weekday: 'long', 
-      month: "long", 
-      day: "numeric", 
-      year: "numeric" 
-    });
+    // Force displaying the exact date from CSV regardless of timezone
+    const result = new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC' // Use UTC to avoid timezone shifts
+    }).format(date);
+    
+    console.log(`Formatted date result: ${result}`);
+    return result;
   }
 
   return (
