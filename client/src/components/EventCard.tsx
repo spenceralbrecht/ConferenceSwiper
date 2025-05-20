@@ -27,10 +27,14 @@ export default function EventCard({ event, drag = false }: EventCardProps) {
     }
   };
 
-  // Format date display
+  // Format date display with timezone handling
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    // Using date-fns or a manual approach to ensure timezone doesn't affect display
+    // Create date parts without timezone shifting
+    const [year, month, day] = dateStr.split('-').map(part => parseInt(part, 10));
+    // Create a date by specifying UTC components, then format it
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: 'UTC' });
   };
 
   // Format time display (HH:MM to h:MM AM/PM)
