@@ -223,6 +223,11 @@ export default function SwipeScreen({ events }: SwipeScreenProps) {
             <h3 className="text-lg font-medium text-gray-700">All Done!</h3>
             <p className="mt-1 text-sm text-gray-500">You've gone through all available events.</p>
             <p className="mt-4 text-sm text-gray-500">Check your schedule to see your selected events.</p>
+            
+            {/* Footer signature */}
+            <div className="mt-8 pt-4 border-t border-gray-100 text-xs text-gray-500 w-full">
+              Made with ♥️ by <a href="https://x.com/@dream_masheen" target="_blank" rel="noopener noreferrer" className="text-rose-500 hover:underline">Spencer</a>
+            </div>
           </div>
         )}
       </div>
