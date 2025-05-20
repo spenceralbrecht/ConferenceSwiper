@@ -73,12 +73,20 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
     removeInterested(eventId);
   };
   
-  // Format date for display in header - fixed for Las Vegas time
+  // Format date for display in header - use exact date from CSV 
   function formatDateHeader(dateStr: string) {
-    // Force the date string to be interpreted in Las Vegas timezone (UTC-7)
-    // Add time to ensure it's the correct date in Las Vegas
-    const date = new Date(`${dateStr}T12:00:00-07:00`);
-    return date.toLocaleDateString("en-US", { weekday: 'long', month: "long", day: "numeric", year: "numeric" });
+    // Parse the date parts directly from the YYYY-MM-DD format
+    const [year, month, day] = dateStr.split('-').map(Number);
+    
+    // Create a date object using the parts
+    const date = new Date(year, month - 1, day); // month is 0-indexed in JS Date
+    
+    return date.toLocaleDateString("en-US", { 
+      weekday: 'long', 
+      month: "long", 
+      day: "numeric", 
+      year: "numeric" 
+    });
   }
 
   return (
