@@ -112,11 +112,20 @@ function parseCSV(csvText: string): Event[] {
     
     // Try to get times from StartTime/EndTime fields first
     if (row.StartTime && row.EndTime) {
+      // Log raw times for debugging
+      console.log(`Raw times for ${row["Event Name"]}: Start=${row.StartTime}, End=${row.EndTime}`);
+      
+      // Properly format the start and end times
       startTime = convertTimeFormat(row.StartTime);
       endTime = convertTimeFormat(row.EndTime);
+      
+      // Log converted times
+      console.log(`Converted times: Start=${startTime}, End=${endTime}`);
     } 
     // Fall back to the Time field if StartTime/EndTime not available
     else if (row.Time) {
+      console.log(`Using Time field for ${row["Event Name"]}: ${row.Time}`);
+      
       // Handle both standard hyphen and em-dash
       if (row.Time.includes("–")) {
         const timeParts = row.Time.split("–");
@@ -127,6 +136,8 @@ function parseCSV(csvText: string): Event[] {
         startTime = convertTimeFormat(timeParts[0].trim());
         endTime = convertTimeFormat(timeParts[1].trim());
       }
+      
+      console.log(`Extracted times: Start=${startTime}, End=${endTime}`);
     }
     
     // Build the additional data for richer event information
@@ -176,43 +187,74 @@ function parseCSV(csvText: string): Event[] {
 
 // Convert time format from "6:00 PM" to "18:00" format
 function convertTimeFormat(timeStr: string): string {
-  // If already in 24-hour format (e.g., "18:00"), return as is
-  if (/^\d{1,2}:\d{2}$/.test(timeStr)) {
-    return timeStr;
+  // If no input or empty string, return default
+  if (!timeStr || timeStr.trim() === '') {
+    console.warn(`Empty time string provided, using default "00:00"`);
+    return "00:00";
+  }
+
+  // Normalize input string - remove extra spaces and make uppercase for consistent matching
+  const normalizedTimeStr = timeStr.trim().toUpperCase();
+  
+  // Check if already in 24-hour format (e.g., "18:00")
+  if (/^\d{1,2}:\d{2}$/.test(normalizedTimeStr)) {
+    console.log(`Already in 24h format: ${normalizedTimeStr}`);
+    const [hours, minutes] = normalizedTimeStr.split(':');
+    // Ensure leading zeros
+    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
   }
   
-  // Handle AM/PM format
   try {
-    // Strip any leading/trailing spaces
-    timeStr = timeStr.trim();
+    // Check for AM/PM format (like "6:00 PM", "6PM", etc.)
+    const isAM = normalizedTimeStr.includes('AM');
+    const isPM = normalizedTimeStr.includes('PM');
     
-    // If it's just a time without AM/PM, return as is
-    if (!timeStr.includes("AM") && !timeStr.includes("PM")) {
-      return timeStr;
+    if (!isAM && !isPM) {
+      // No AM/PM indicator - assume it's 24-hour format but might be missing formatting
+      if (normalizedTimeStr.includes(':')) {
+        // Has colon - assume it's just missing leading zeros
+        const [hours, minutes] = normalizedTimeStr.split(':');
+        return `${parseInt(hours).toString().padStart(2, '0')}:${parseInt(minutes).toString().padStart(2, '0')}`;
+      }
+      
+      // Just a number (like "7" or "14") - assume hours only
+      return `${parseInt(normalizedTimeStr).toString().padStart(2, '0')}:00`;
     }
     
-    // Parse the time components
-    const isPM = timeStr.includes("PM");
-    const timePart = timeStr.replace(/\s*[AP]M.*$/i, "").trim();
+    // Extract numeric part by removing AM/PM
+    let timePart = normalizedTimeStr.replace(/\s*(AM|PM).*$/i, '').trim();
     
-    let [hours, minutes] = timePart.split(":");
-    let hour = parseInt(hours);
-    
-    // Convert to 24-hour format
-    if (isPM && hour < 12) {
-      hour += 12;
-    } else if (!isPM && hour === 12) {
-      hour = 0;
+    // Check if we have a colon (time with minutes)
+    if (timePart.includes(':')) {
+      let [hours, minutes] = timePart.split(':');
+      let hour = parseInt(hours);
+      
+      // Convert to 24-hour format
+      if (isPM && hour < 12) {
+        hour += 12;
+      } else if (isAM && hour === 12) {
+        hour = 0;
+      }
+      
+      // Format with leading zeros
+      return `${hour.toString().padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+    } else {
+      // No colon, just hours (like "7PM")
+      let hour = parseInt(timePart);
+      
+      // Convert to 24-hour format
+      if (isPM && hour < 12) {
+        hour += 12;
+      } else if (isAM && hour === 12) {
+        hour = 0;
+      }
+      
+      return `${hour.toString().padStart(2, '0')}:00`;
     }
-    
-    // Format with leading zeros
-    const formattedHour = hour.toString().padStart(2, "0");
-    const formattedMinutes = minutes ? minutes.padStart(2, "0") : "00";
-    
-    return `${formattedHour}:${formattedMinutes}`;
   } catch (err) {
     console.error(`Error converting time format: ${timeStr}`, err);
-    return timeStr; // Return original if parsing fails
+    // Default to midnight if we can't parse
+    return "00:00";
   }
 }
 
