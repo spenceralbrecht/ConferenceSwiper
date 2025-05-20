@@ -324,6 +324,11 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
           <p className="mt-1 text-sm text-gray-500">Start swiping to build your schedule</p>
         </div>
       )}
+      
+      {/* Footer */}
+      <div className="mt-8 pt-4 border-t border-gray-100 text-center text-xs text-gray-500">
+        Made with ♥️ by <a href="https://x.com/@dream_masheen" target="_blank" rel="noopener noreferrer" className="text-rose-500 hover:underline">Spencer</a>
+      </div>
     </div>
   );
 }
