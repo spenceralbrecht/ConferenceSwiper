@@ -73,29 +73,42 @@ export default function ScheduleScreen({ events }: ScheduleScreenProps) {
     removeInterested(eventId);
   };
   
-  // Format date for display in header - ensure correct date display
+  // Direct date formatting function - use hardcoded mapping to ensure correct display
   function formatDateHeader(dateStr: string) {
-    // Add debug info
-    console.log(`Formatting date: ${dateStr}`);
+    // Directly map date strings to their desired display format
+    const dateMap: Record<string, string> = {
+      "2025-05-19": "Monday, May 19, 2025",
+      "2025-05-20": "Tuesday, May 20, 2025",
+      "2025-05-21": "Wednesday, May 21, 2025",
+      "2025-05-22": "Thursday, May 22, 2025",
+      "2025-05-23": "Friday, May 23, 2025"
+    };
     
-    // Use UTC date to avoid timezone issues
+    // Use the direct mapping if it exists
+    if (dateMap[dateStr]) {
+      console.log(`Using direct date mapping for ${dateStr}: ${dateMap[dateStr]}`);
+      return dateMap[dateStr];
+    }
+    
+    // Fallback to parsing date (should not normally happen)
+    console.warn(`No direct mapping found for date ${dateStr}, using fallback method`);
+    
+    // Parse YYYY-MM-DD manually to avoid timezone issues
     const [year, month, day] = dateStr.split('-').map(Number);
     
-    // Create date with UTC to avoid any timezone adjustments
-    const date = new Date(Date.UTC(year, month - 1, day));
-    console.log(`Created date object: ${date.toISOString()}`);
+    // Month names for manual formatting
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+                         "July", "August", "September", "October", "November", "December"];
+                         
+    // Day names for manual formatting
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     
-    // Force displaying the exact date from CSV regardless of timezone
-    const result = new Intl.DateTimeFormat('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-      timeZone: 'UTC' // Use UTC to avoid timezone shifts
-    }).format(date);
+    // Create a local date with the exact values (this is only for getting the day of week)
+    const date = new Date(year, month - 1, day);
+    const dayOfWeek = dayNames[date.getDay()];
     
-    console.log(`Formatted date result: ${result}`);
-    return result;
+    // Format manually to ensure exact day
+    return `${dayOfWeek}, ${monthNames[month - 1]} ${day}, ${year}`;
   }
 
   return (
